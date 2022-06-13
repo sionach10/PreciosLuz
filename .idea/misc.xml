@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_baseline_email_24.xml" value="0.274" />
+        <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_flecha_atras.xml" value="0.294" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_person.xml" value="0.196" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/icono_borrar.xml" value="0.274" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/rounded_boton.xml" value="0.274" />
@@ -11,8 +12,8 @@
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout-w1240dp/activity_login.xml" value="0.17302543507362783" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout-w936dp/activity_login.xml" value="0.201953125" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/activity_login.xml" value="0.26927083333333335" />
-        <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/activity_main.xml" value="0.25" />
-        <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/activity_register.xml" value="0.27447916666666666" />
+        <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/activity_main.xml" value="0.13" />
+        <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/activity_register.xml" value="0.14" />
       </map>
     </option>
   </component>
@@ -21,5 +22,12 @@
   </component>
   <component name="ProjectType">
     <option name="id" value="Android" />
+  </component>
+  <component name="VisualizationToolProject">
+    <option name="state">
+      <ProjectState>
+        <option name="scale" value="0.13" />
+      </ProjectState>
+    </option>
   </component>
 </project>
