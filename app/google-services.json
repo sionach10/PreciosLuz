@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "706232977448",
+    "project_id": "socialtravel-ad3fb",
+    "storage_bucket": "socialtravel-ad3fb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:706232977448:android:6761a7dc5b19a6c2824d1d",
+        "android_client_info": {
+          "package_name": "com.socialtravel"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "706232977448-ri66qtad3qgmg7l2pr7b87304a59474c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.socialtravel",
+            "certificate_hash": "33b078c4544d4243a745945b90912aa9fd87ceae"
+          }
+        },
+        {
+          "client_id": "706232977448-pjro1muekkfherfdto2k3uegg174gcc5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZkCVOWFZQp4yrAjXMCG17OxJhybIqL60"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "706232977448-pjro1muekkfherfdto2k3uegg174gcc5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
