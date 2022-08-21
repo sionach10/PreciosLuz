@@ -22,12 +22,18 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
     SignInButton mButtonGoogle;
     private GoogleSignInClient mGoogleSignInClient;
-    private final int REQUEST_CODE_GOOGLE = 1;
+    FirebaseFirestore mFirestore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
                                 .build();
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        mFirestore = FirebaseFirestore.getInstance();
+
 
         mButtonGoogle.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,8 +147,8 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()) {
-                            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-                            startActivity(intent);
+                            String id = mAuth.getCurrentUser().getUid();
+                            checkUserExist(id);
                         }
                         else {
                             //if signIn fails.
@@ -149,6 +157,35 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+    //Cuando inicia sesión con Google, chequeamos si es la primera vez, para crear el usuario en BBDD.
+    private void checkUserExist(final String id) {
+        mFirestore.collection("Users").document(id).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if(documentSnapshot.exists()){
+                    Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                    startActivity(intent);
+                }
+                else { //Si el usuario no existe.
+                    String email = mAuth.getCurrentUser().getEmail();
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("email", email);
+                    mFirestore.collection("Users").document(id).set(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if(task.isSuccessful()){
+                                Intent intent = new Intent(MainActivity.this, CompleteProfileActivity.class);
+                                startActivity(intent);
+                            }
+                            else {
+                                Toast.makeText(MainActivity.this, "No se pudo almacenar el usuario en BBDD", Toast.LENGTH_LONG);
+                            }
+                        }
+                    });
+                }
+            }
+        });
     }
 
     private void loginEmail()

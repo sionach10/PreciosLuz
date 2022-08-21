@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_baseline_email_24.xml" value="0.274" />
+        <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_baseline_person_24_color.xml" value="0.1" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_flecha_atras.xml" value="0.294" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_person.xml" value="0.196" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/icono_borrar.xml" value="0.274" />
@@ -11,6 +12,7 @@
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/rounded_button.xml" value="0.274" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout-w1240dp/activity_login.xml" value="0.17302543507362783" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout-w936dp/activity_login.xml" value="0.201953125" />
+        <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/activity_complete_profile.xml" value="0.18" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/activity_home.xml" value="0.1361842105263158" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/activity_login.xml" value="0.26927083333333335" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/activity_main.xml" value="0.18" />
