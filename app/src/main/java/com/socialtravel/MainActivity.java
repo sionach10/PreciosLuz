@@ -1,5 +1,9 @@
 package com.socialtravel;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -80,9 +84,37 @@ public class MainActivity extends AppCompatActivity {
 
     private void signInGoogle() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, REQUEST_CODE_GOOGLE);
+        //startActivityForResult(signInIntent, REQUEST_CODE_GOOGLE);
+        activityResultLauncher.launch(signInIntent);
     }
 
+    ActivityResultLauncher<Intent> activityResultLauncher =
+            registerForActivityResult(
+                    new ActivityResultContracts.StartActivityForResult(),
+                    new ActivityResultCallback<ActivityResult>() {
+                        @Override
+                        public void onActivityResult(ActivityResult activityResult) {
+                            int requestCode = activityResult.getResultCode();
+                            Intent data = activityResult.getData();
+
+                            //Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+                            if(requestCode == RESULT_OK) {
+                                Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+                                try {
+                                    //Google Sign in was successful, authenticate with firebase.
+                                    GoogleSignInAccount account = task.getResult(ApiException.class);
+                                    firebaseAuthWithGoogle(account);
+                                }catch(ApiException e) {
+                                    Log.w("Error","Google Sign in failed.", e);
+                                    // ...
+                                }
+                            }
+
+                        }
+                    }
+            );
+
+/* Funcion que va con startActivityForResult que está deprecada.
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -99,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
+*/
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
