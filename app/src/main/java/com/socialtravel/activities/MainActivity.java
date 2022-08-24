@@ -1,4 +1,4 @@
-package com.socialtravel;
+package com.socialtravel.activities;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -31,6 +31,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.socialtravel.R;
+import com.socialtravel.models.User;
+import com.socialtravel.providers.AuthProvider;
+import com.socialtravel.providers.UserProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,10 +45,10 @@ public class MainActivity extends AppCompatActivity {
     TextInputEditText mTextInputEmail;
     TextInputEditText mTextInputPassword;
     Button mButtonLoginEmail;
-    FirebaseAuth mAuth;
+    AuthProvider mAuthProvider;
     SignInButton mButtonGoogle;
     private GoogleSignInClient mGoogleSignInClient;
-    FirebaseFirestore mFirestore;
+    UserProvider mUserProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         mTextInputPassword = findViewById(R.id.textInputPassword);
         mButtonLoginEmail = findViewById(R.id.btnLoginEmail);
         mButtonGoogle = findViewById(R.id.btnLoginGoogle);
-        mAuth = FirebaseAuth.getInstance();
+        mAuthProvider = new AuthProvider();
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -64,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
                                 .build();
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-        mFirestore = FirebaseFirestore.getInstance();
+        mUserProvider = new UserProvider();
 
 
         mButtonGoogle.setOnClickListener(new View.OnClickListener() {
@@ -141,13 +145,12 @@ public class MainActivity extends AppCompatActivity {
     }
 */
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+
+        mAuthProvider.googleLogin(acct).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()) {
-                            String id = mAuth.getCurrentUser().getUid();
+                            String id = mAuthProvider.getUid();
                             checkUserExist(id);
                         }
                         else {
@@ -160,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
     }
     //Cuando inicia sesión con Google, chequeamos si es la primera vez, para crear el usuario en BBDD.
     private void checkUserExist(final String id) {
-        mFirestore.collection("Users").document(id).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        mUserProvider.getUser(id).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 if(documentSnapshot.exists()){
@@ -168,10 +171,11 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
                 else { //Si el usuario no existe.
-                    String email = mAuth.getCurrentUser().getEmail();
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("email", email);
-                    mFirestore.collection("Users").document(id).set(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    String email = mAuthProvider.getEmail();
+                    User user = new User();
+                    user.setEmail(email);
+                    user.setId(id);
+                    mUserProvider.create(user).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if(task.isSuccessful()){
@@ -192,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
     {
         String email = mTextInputEmail.getText().toString();
         String password = mTextInputPassword.getText().toString();
-        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        mAuthProvider.login(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()) {
