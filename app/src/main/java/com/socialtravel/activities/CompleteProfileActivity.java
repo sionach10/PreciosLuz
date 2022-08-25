@@ -12,6 +12,9 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.socialtravel.R;
+import com.socialtravel.models.User;
+import com.socialtravel.providers.AuthProvider;
+import com.socialtravel.providers.UserProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,8 +23,8 @@ public class CompleteProfileActivity extends AppCompatActivity {
 
     TextInputEditText mTextInputUserName;
     Button mButtonConfirm;
-    FirebaseAuth mAuth;
-    FirebaseFirestore mFirestore;
+    AuthProvider mAuthProvider;
+    UserProvider mUserProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,8 +33,9 @@ public class CompleteProfileActivity extends AppCompatActivity {
 
         mTextInputUserName = findViewById(R.id.textInputUserName);
         mButtonConfirm = findViewById(R.id.btnConfirm);
-        mAuth = FirebaseAuth.getInstance();
-        mFirestore = FirebaseFirestore.getInstance();
+
+        mAuthProvider = new AuthProvider();
+        mUserProvider = new UserProvider();
 
         mButtonConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,10 +61,13 @@ public class CompleteProfileActivity extends AppCompatActivity {
     }
 
     private void updateUser(final String username){
-        String id = mAuth.getCurrentUser().getUid();
-        Map<String, Object> map = new HashMap<>();
-        map.put("username", username);
-        mFirestore.collection("Users").document(id).update(map).addOnCompleteListener((task) ->  {
+        String id = mAuthProvider.getUid();
+        User user = new User();
+        user.setId(id);
+        user.setUsername(username);
+
+
+        mUserProvider.update(user).addOnCompleteListener((task) ->  {
                 if(task.isSuccessful()){
                     Intent intent = new Intent(CompleteProfileActivity.this, HomeActivity.class);
                     startActivity(intent);
