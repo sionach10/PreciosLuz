@@ -7,9 +7,27 @@
     android:fitsSystemWindows="true"
     tools:context=".activities.HomeActivity">
 
-    <TextView
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="HOME ACTIVITY"
-        android:gravity="center"/>
+        android:layout_height="match_parent"
+        android:id="@+id/container"
+
+        >
+        <!-- Main content -->
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_navigation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="@color/design_default_color_primary"
+            app:itemIconTint="@color/white"
+            app:itemTextColor="@color/white"
+            app:menu="@menu/bottom_navigation_menu"
+            />
+
+    </FrameLayout>
+
+
+
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
