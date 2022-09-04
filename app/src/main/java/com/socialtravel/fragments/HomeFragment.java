@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.socialtravel.R;
+import com.socialtravel.activities.HomeActivity;
+import com.socialtravel.activities.MainActivity;
 import com.socialtravel.activities.PostActivity;
 
 public class HomeFragment extends Fragment {
@@ -38,7 +40,10 @@ public class HomeFragment extends Fragment {
     }
 
     private void goToPost() {
+        // Vamos de un fragment a un activity, por eso el metodo intent cambia respecto al que
+        // teníamos en los activities.
         Intent intent = new Intent(getContext(), PostActivity.class);
         startActivity(intent);
+
     }
 }

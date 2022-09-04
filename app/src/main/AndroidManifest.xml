@@ -14,7 +14,7 @@
         android:theme="@style/Theme.SocialTravel"
         tools:targetApi="31">
         <activity
-            android:name=".PostActivity"
+            android:name=".activities.PostActivity"
             android:exported="false" />
         <activity
             android:name=".activities.CompleteProfileActivity"
