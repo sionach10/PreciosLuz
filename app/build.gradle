@@ -48,7 +48,11 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore'
     implementation 'com.google.android.gms:play-services-auth:20.2.0'
     implementation 'androidx.coordinatorlayout:coordinatorlayout:1.1.0'
-
+    implementation 'com.google.firebase:firebase-storage:19.1.1'
+    implementation('id.zelory:compressor:2.1.0') {
+        exclude module: 'unspecified'
+    }
+    implementation 'com.squareup.picasso:picasso:2.5.2'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
