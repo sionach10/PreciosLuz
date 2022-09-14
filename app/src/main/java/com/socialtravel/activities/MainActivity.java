@@ -1,5 +1,6 @@
 package com.socialtravel.activities;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,6 +33,7 @@ import com.socialtravel.models.User;
 import com.socialtravel.providers.AuthProvider;
 import com.socialtravel.providers.UserProvider;
 
+import dmax.dialog.SpotsDialog;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -44,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     SignInButton mButtonGoogle;
     private GoogleSignInClient mGoogleSignInClient;
     UserProvider mUserProvider;
+    SpotsDialog mDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +59,9 @@ public class MainActivity extends AppCompatActivity {
         mButtonLoginEmail = findViewById(R.id.btnLoginEmail);
         mButtonGoogle = findViewById(R.id.btnLoginGoogle);
         mAuthProvider = new AuthProvider();
+
+        mDialog = new SpotsDialog(this);
+
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -140,10 +146,12 @@ public class MainActivity extends AppCompatActivity {
     }
 */
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-
+        mDialog.show();
+        mDialog.setMessage("Cargando");
         mAuthProvider.googleLogin(acct).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
+                        mDialog.dismiss();
                         if(task.isSuccessful()) {
                             String id = mAuthProvider.getUid();
                             checkUserExist(id);
@@ -191,9 +199,12 @@ public class MainActivity extends AppCompatActivity {
     {
         String email = mTextInputEmail.getText().toString();
         String password = mTextInputPassword.getText().toString();
+        mDialog.show();
+        mDialog.setMessage("Cargando");
         mAuthProvider.login(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
+                mDialog.dismiss();
                 if(task.isSuccessful()) {
                     Intent intent = new Intent(MainActivity.this, HomeActivity.class);//Se le pasa pantalla origen y pantalla destino.
                     startActivity(intent);
