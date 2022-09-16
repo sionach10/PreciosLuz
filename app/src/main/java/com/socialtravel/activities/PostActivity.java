@@ -6,11 +6,17 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.content.FileProvider;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -29,13 +35,20 @@ import com.socialtravel.providers.AuthProvider;
 import com.socialtravel.providers.ImageProvider;
 import com.socialtravel.providers.PostProvider;
 import com.socialtravel.utils.FileUtil;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Date;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dmax.dialog.SpotsDialog;
 
 public class PostActivity extends AppCompatActivity {
+
+    private static final int IMAGE_1 = 1;
+    private static final int IMAGE_2 = 2;
+    private static final int CAMERA_REQUEST_CODE = 3;
 
     ImageView mImageViewPost1;
     ImageView mImageViewPost2;
@@ -57,7 +70,16 @@ public class PostActivity extends AppCompatActivity {
     String mTitle = "";
     String mdescription = "";
     SpotsDialog mDialog;
+    AlertDialog.Builder mBuilderSelector;
+    CharSequence options[];
+    enum fuenteImagen { camara, galeria}
+    fuenteImagen mFuenteImagen;
+    int imageSelected;
 
+
+    String mAbsolutePhotoPath;
+    String mPhotoPath;
+    File mPhotoFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +90,9 @@ public class PostActivity extends AppCompatActivity {
         mPostProvider = new PostProvider();
         mAuthProvider = new AuthProvider();
         mDialog = new SpotsDialog(this);
+        mBuilderSelector = new AlertDialog.Builder(this);
+        mBuilderSelector.setTitle("Selecciona una opción");
+        options = new CharSequence[] {"Galería", "Tomar foto"};
 
         mImageViewPost1 = findViewById(R.id.imageViewPost1);
         mImageViewPost2 = findViewById(R.id.imageViewPost2);
@@ -98,14 +123,17 @@ public class PostActivity extends AppCompatActivity {
         mImageViewPost1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openGallery1();
+                imageSelected = 1;
+                selectOptionImage();
+
             }
         });
 
         mImageViewPost2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openGallery2();
+                imageSelected = 2;
+                selectOptionImage();
             }
         });
 
@@ -140,6 +168,53 @@ public class PostActivity extends AppCompatActivity {
                 mTextViewCategory.setText(mCategory);
             }
         });
+    }
+
+    private void selectOptionImage() {
+        mBuilderSelector.setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int i) {
+                        if(i == 0) {
+                            mFuenteImagen = fuenteImagen.galeria;
+                            openGallery();
+                        }
+                        else if(i==1) {
+                            mFuenteImagen = fuenteImagen.camara;
+                            takePhoto();
+                        }
+                    }
+        });
+
+        mBuilderSelector.show();
+
+    }
+
+
+    private void takePhoto() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        File photoFile = null;
+        try{
+            photoFile = createPhotoFile();
+        }catch (Exception e) {
+            Toast.makeText(this, "Hubo un error con el archivo de la camara" + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+
+        if(photoFile != null) {
+            Uri photoUri = FileProvider.getUriForFile(PostActivity.this, "com.socialtravel", photoFile);
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+            activityResultLauncher1.launch(takePictureIntent);
+        }
+
+
+    }
+
+    private File createPhotoFile() throws IOException {
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File photoFile = File.createTempFile(new Date() + "_photo", ".jpg", storageDir);
+        mPhotoPath = "file:" + photoFile.getAbsolutePath();
+        mAbsolutePhotoPath = photoFile.getAbsolutePath();
+        return photoFile;
     }
 
     private void clickPost() {
@@ -237,7 +312,7 @@ public class PostActivity extends AppCompatActivity {
         mImageFile2 = null;
     }
 
-    private void openGallery1() { //De momento creo una función para cada imagen porque no puedo pasar parametro en launch.
+    private void openGallery() {
         Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
         galleryIntent.setType("image/*");
         activityResultLauncher1.launch(galleryIntent);
@@ -253,50 +328,36 @@ public class PostActivity extends AppCompatActivity {
                             Intent data = activityResult.getData();
 
                             //Result returned from launching the Intent
-                            if(requestCode == RESULT_OK) {
+                            if (requestCode == RESULT_OK && imageSelected == 1 && mFuenteImagen == fuenteImagen.galeria) {
                                 try {
                                     mImageFile = FileUtil.from(PostActivity.this, data.getData());//Nos transforma la URI de la imagen en el archivo (Creo).
                                     mImageViewPost1.setImageBitmap(BitmapFactory.decodeFile(mImageFile.getAbsolutePath()));
 
-                                }catch(Exception e) {
-                                    Log.w("ERROR","Gallery Intent failed, error: ", e);
-                                    Toast.makeText(PostActivity.this, "Error al cargar la imagen", Toast.LENGTH_SHORT).show();
-                                    // ...
+                                } catch (Exception e) {
+                                    Log.w("ERROR", "Gallery 1 Intent failed, error: ", e);
+                                    Toast.makeText(PostActivity.this, "Error al cargar la imagen 1", Toast.LENGTH_SHORT).show();
                                 }
                             }
-
-                        }
-                    }
-            );
-
-    private void openGallery2() {
-        Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        galleryIntent.setType("image/*");
-        activityResultLauncher2.launch(galleryIntent);
-    }
-
-    ActivityResultLauncher<Intent> activityResultLauncher2 =
-            registerForActivityResult(
-                    new ActivityResultContracts.StartActivityForResult(),
-                    new ActivityResultCallback<ActivityResult>() {
-                        @Override
-                        public void onActivityResult(ActivityResult activityResult) {
-                            int requestCode = activityResult.getResultCode();
-                            Intent data = activityResult.getData();
-
-                            //Result returned from launching the Intent
-                            if(requestCode == RESULT_OK) {
+                            else if (requestCode == RESULT_OK && imageSelected == 2 && mFuenteImagen == fuenteImagen.galeria) {
                                 try {
                                     mImageFile2 = FileUtil.from(PostActivity.this, data.getData());//Nos transforma la URI de la imagen en el archivo (Creo).
                                     mImageViewPost2.setImageBitmap(BitmapFactory.decodeFile(mImageFile2.getAbsolutePath()));
-
-                                }catch(Exception e) {
-                                    Log.w("ERROR","Gallery Intent failed, error: ", e);
-                                    Toast.makeText(PostActivity.this, "Error al cargar la imagen", Toast.LENGTH_SHORT).show();
-                                    // ...
+                                } catch (Exception e) {
+                                    Log.w("ERROR", "Gallery 2 Intent failed, error: ", e);
+                                    Toast.makeText(PostActivity.this, "Error al cargar la imagen 2", Toast.LENGTH_SHORT).show();
                                 }
                             }
-
+                            else if(requestCode == RESULT_OK && mFuenteImagen == fuenteImagen.camara) { //Imagen de la camara.
+                                if(imageSelected == 1)
+                                    Picasso.with(PostActivity.this).load(mPhotoPath).into(mImageViewPost1);
+                                else if(imageSelected == 2)
+                                    Picasso.with(PostActivity.this).load(mPhotoPath).into(mImageViewPost2);
+                                else
+                                    Toast.makeText(PostActivity.this, "Error valor imageSelected", Toast.LENGTH_SHORT).show();
+                            }
+                            else {
+                                Toast.makeText(PostActivity.this, "Error al cargar la imagen de la camara", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     }
             );
