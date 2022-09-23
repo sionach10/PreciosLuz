@@ -79,7 +79,10 @@ public class PostActivity extends AppCompatActivity {
 
     String mAbsolutePhotoPath;
     String mPhotoPath;
+    String mAbsolutePhotoPath2;
+    String mPhotoPath2;
     File mPhotoFile;
+    File mPhotoFile2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -172,17 +175,17 @@ public class PostActivity extends AppCompatActivity {
 
     private void selectOptionImage() {
         mBuilderSelector.setItems(options, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int i) {
-                        if(i == 0) {
-                            mFuenteImagen = fuenteImagen.galeria;
-                            openGallery();
-                        }
-                        else if(i==1) {
-                            mFuenteImagen = fuenteImagen.camara;
-                            takePhoto();
-                        }
-                    }
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                if(i == 0) {
+                    mFuenteImagen = fuenteImagen.galeria;
+                    openGallery();
+                }
+                else if(i==1) {
+                    mFuenteImagen = fuenteImagen.camara;
+                    takePhoto();
+                }
+            }
         });
 
         mBuilderSelector.show();
@@ -212,9 +215,16 @@ public class PostActivity extends AppCompatActivity {
     private File createPhotoFile() throws IOException {
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File photoFile = File.createTempFile(new Date() + "_photo", ".jpg", storageDir);
-        mPhotoPath = "file:" + photoFile.getAbsolutePath();
-        mAbsolutePhotoPath = photoFile.getAbsolutePath();
-        return photoFile;
+
+        if(imageSelected == 1) {
+            mPhotoPath = "file:" + photoFile.getAbsolutePath();
+            mAbsolutePhotoPath = photoFile.getAbsolutePath();
+        }
+        else if(imageSelected == 2) {
+            mPhotoPath2 = "file:" + photoFile.getAbsolutePath();
+            mAbsolutePhotoPath2 = photoFile.getAbsolutePath();
+        }
+             return photoFile;
     }
 
     private void clickPost() {
@@ -222,11 +232,25 @@ public class PostActivity extends AppCompatActivity {
         mdescription = mTextInputDescription.getText().toString();
 
         if(!mTitle.isEmpty() && !mdescription.isEmpty() && !mCategory.isEmpty()) {
+
+            //2 GALERIA.
             if(mImageFile!= null && mImageFile2!= null) {
-                saveImage();
+                saveImage(mImageFile, mImageFile2);
+            }
+            //2 CAMARA.
+            else if(mPhotoFile != null && mPhotoFile2!= null){
+                saveImage(mPhotoFile, mPhotoFile2);
+            }
+            //1 CAMARA, 2 GALERIA.
+            else if(mPhotoFile != null && mImageFile2!= null){
+                saveImage(mPhotoFile, mImageFile2);
+            }
+            //1 GALERIA, 2 CAMARA.
+            else if(mImageFile != null && mPhotoFile2!= null){
+                saveImage(mPhotoFile, mPhotoFile2);
             }
             else {
-                Toast.makeText(this, "Debes seleccionar una imagen.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Imagenes vacías.", Toast.LENGTH_LONG).show();
             }
         }
         else {
@@ -235,10 +259,10 @@ public class PostActivity extends AppCompatActivity {
 
     }
 
-    private void saveImage() {
+    private void saveImage(File _mImageFile1, File _mImageFile2) {
         mDialog.show();
         mDialog.setMessage("Guardando");
-        mImageProvider.save(PostActivity.this, mImageFile).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+        mImageProvider.save(PostActivity.this, _mImageFile1).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
 
@@ -248,7 +272,7 @@ public class PostActivity extends AppCompatActivity {
                         public void onSuccess(Uri uri) {
                             final String url = uri.toString();
 
-                            mImageProvider.save(PostActivity.this, mImageFile2).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                            mImageProvider.save(PostActivity.this, _mImageFile2).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                                 @Override
                                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> taskImage2) {
                                     if(taskImage2.isSuccessful()) {
@@ -330,6 +354,7 @@ public class PostActivity extends AppCompatActivity {
                             //Result returned from launching the Intent
                             if (requestCode == RESULT_OK && imageSelected == 1 && mFuenteImagen == fuenteImagen.galeria) {
                                 try {
+                                    mPhotoFile= null;
                                     mImageFile = FileUtil.from(PostActivity.this, data.getData());//Nos transforma la URI de la imagen en el archivo (Creo).
                                     mImageViewPost1.setImageBitmap(BitmapFactory.decodeFile(mImageFile.getAbsolutePath()));
 
@@ -340,6 +365,7 @@ public class PostActivity extends AppCompatActivity {
                             }
                             else if (requestCode == RESULT_OK && imageSelected == 2 && mFuenteImagen == fuenteImagen.galeria) {
                                 try {
+                                    mPhotoFile2 = null;
                                     mImageFile2 = FileUtil.from(PostActivity.this, data.getData());//Nos transforma la URI de la imagen en el archivo (Creo).
                                     mImageViewPost2.setImageBitmap(BitmapFactory.decodeFile(mImageFile2.getAbsolutePath()));
                                 } catch (Exception e) {
@@ -348,10 +374,16 @@ public class PostActivity extends AppCompatActivity {
                                 }
                             }
                             else if(requestCode == RESULT_OK && mFuenteImagen == fuenteImagen.camara) { //Imagen de la camara.
-                                if(imageSelected == 1)
+                                if(imageSelected == 1) {
+                                    mImageFile = null;
+                                    mPhotoFile = new File(mAbsolutePhotoPath);
                                     Picasso.with(PostActivity.this).load(mPhotoPath).into(mImageViewPost1);
-                                else if(imageSelected == 2)
-                                    Picasso.with(PostActivity.this).load(mPhotoPath).into(mImageViewPost2);
+                                }
+                                else if(imageSelected == 2) {
+                                    mImageFile2 = null;
+                                    mPhotoFile2 = new File(mAbsolutePhotoPath2);
+                                    Picasso.with(PostActivity.this).load(mPhotoPath2).into(mImageViewPost2);
+                                }
                                 else
                                     Toast.makeText(PostActivity.this, "Error valor imageSelected", Toast.LENGTH_SHORT).show();
                             }
