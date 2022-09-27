@@ -6,6 +6,7 @@
     tools:context=".fragments.HomeFragment"
     android:layout_marginBottom="50dp">
 
+    <include layout="@layout/action_bar_toolbar" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"

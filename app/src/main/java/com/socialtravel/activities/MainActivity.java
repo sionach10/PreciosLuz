@@ -95,6 +95,16 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override //Para que entre en Home sin entrar en la pantalla de login (Para usuarios ya logueados).
+    protected void onStart() {
+        super.onStart();
+        if (mAuthProvider.getUserSession() != null) {
+            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK); //Limpiamos historial del botón atras.
+            startActivity(intent);
+        }
+    }
+
     private void signInGoogle() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         //startActivityForResult(signInIntent, REQUEST_CODE_GOOGLE);
