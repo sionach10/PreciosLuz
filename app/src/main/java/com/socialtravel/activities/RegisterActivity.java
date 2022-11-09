@@ -20,12 +20,14 @@ import com.socialtravel.models.User;
 import com.socialtravel.providers.AuthProvider;
 import com.socialtravel.providers.UserProvider;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import dmax.dialog.SpotsDialog;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -34,9 +36,11 @@ public class RegisterActivity extends AppCompatActivity {
     TextInputEditText mTextInputEmail;
     TextInputEditText mTextInputPassword;
     TextInputEditText mTextInputPasswordConfirmation;
+    TextInputEditText mTextInputPhone;
     Button mButtonRegister;
     AuthProvider mAuthProvider;
     UserProvider mUserProvider;
+    SpotsDialog mDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,9 +52,11 @@ public class RegisterActivity extends AppCompatActivity {
         mTextInputEmail = findViewById(R.id.textInputEmail);
         mTextInputPassword = findViewById(R.id.textInputPassword);
         mTextInputPasswordConfirmation = findViewById(R.id.textInputPasswordConfirmation);
+        mTextInputPhone = findViewById(R.id.textInputPhone);
         mButtonRegister = findViewById(R.id.btnRegister);
         mAuthProvider = new AuthProvider();
         mUserProvider = new UserProvider();
+        mDialog = new SpotsDialog(this);
 
         mButtonRegister.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,12 +79,13 @@ public class RegisterActivity extends AppCompatActivity {
         String email = mTextInputEmail.getText().toString();
         String password = mTextInputPassword.getText().toString();
         String passwordConfirmation = mTextInputPasswordConfirmation.getText().toString();
+        String phone = mTextInputPhone.getText().toString();
 
-        if(!username.isEmpty() && !email.isEmpty() && !password.isEmpty() && !passwordConfirmation.isEmpty()){
+        if(!username.isEmpty() && !email.isEmpty() && !password.isEmpty() && !passwordConfirmation.isEmpty() && !phone.isEmpty()){
             if(isEmailValid(email)){
                 if(password.equals(passwordConfirmation)){
                     if(password.length()>=8)
-                        createUser(username, email, password);
+                        createUser(username, email, password, phone);
                     else
                         Toast.makeText(this, "La contraseña debe ser al menos de 8 caracteres.", Toast.LENGTH_SHORT).show();
                 }
@@ -101,16 +108,21 @@ public class RegisterActivity extends AppCompatActivity {
         return matcher.matches();
     }
 
-    private void createUser(final String username, final String email, String password){
+    private void createUser(final String username, final String email, String password, final String phone){
+        mDialog.show();
+        mDialog.setMessage("Cargando");
         mAuthProvider.register(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
+                mDialog.dismiss();
                 if(task.isSuccessful()) {
                     String id = mAuthProvider.getUid();
                     User user = new User();
                     user.setId(id);
                     user.setEmail(email);
                     user.setUsername(username);
+                    user.setPhone(phone);
+                    user.setTimestamp(new Date().getTime());
 
                     mUserProvider.create(user).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
