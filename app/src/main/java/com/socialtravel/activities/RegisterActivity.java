@@ -47,7 +47,7 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        mCircleFlechaAtras = findViewById(R.id.flecha_atras);
+        mCircleFlechaAtras = findViewById(R.id.circleImageBack);
         mTextInputUserName = findViewById(R.id.textInputUserName);
         mTextInputEmail = findViewById(R.id.textInputEmail);
         mTextInputPassword = findViewById(R.id.textInputPassword);
