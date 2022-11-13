@@ -321,7 +321,7 @@
         android:id="@+id/circle_image_back"
         android:layout_width="40dp"
         android:layout_height="30dp"
-        android:src="@drawable/ic_flecha_atras"
+        android:src="@drawable/ic_flecha_atras_post"
         android:layout_marginTop="17dp"
         android:layout_marginLeft="30dp"/>
 
