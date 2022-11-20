@@ -76,12 +76,14 @@ public class PostActivity extends AppCompatActivity {
     fuenteImagen mFuenteImagen;
     int imageSelected;
 
-
+    //Foto 1
     String mAbsolutePhotoPath;
     String mPhotoPath;
+    File mPhotoFile;
+
+    //Foto 2
     String mAbsolutePhotoPath2;
     String mPhotoPath2;
-    File mPhotoFile;
     File mPhotoFile2;
 
     @Override

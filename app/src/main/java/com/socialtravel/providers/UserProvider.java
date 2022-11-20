@@ -6,6 +6,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.socialtravel.models.User;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,7 +32,9 @@ public class UserProvider {
         Map<String, Object> map = new HashMap<>();
         map.put( "username", user.getUsername());
         map.put( "phone", user.getPhone());
-        map.put( "timestamp", user.getTimestamp());
+        map.put( "timestamp", new Date().getTime());
+        map.put( "image_profile", user.getImageProfile());
+        map.put( "image_cover", user.getImageCover());
         return mCollection.document(user.getId()).update(map);
     }
 }
