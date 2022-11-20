@@ -26,9 +26,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.storage.UploadTask;
 import com.socialtravel.R;
-import com.socialtravel.models.Post;
 import com.socialtravel.models.User;
 import com.socialtravel.providers.AuthProvider;
 import com.socialtravel.providers.ImageProvider;
@@ -53,6 +53,8 @@ public class EditProfileActivity extends AppCompatActivity {
     Button mButtonEditProfile;
     String mUsername = "";
     String mPhone = "";
+    String mImageProfile = "";
+    String mImageCover = "";
     SpotsDialog mDialog;
     ImageProvider mImageProvider;
     UserProvider mUserProvider;
@@ -60,9 +62,10 @@ public class EditProfileActivity extends AppCompatActivity {
 
     AlertDialog.Builder mBuilderSelector;
     CharSequence options[];
-    enum fuenteImagen { cover, profile}
+    enum fuenteImagen { camara, galeria}
     EditProfileActivity.fuenteImagen mFuenteImagen;
-    int imageSelected;
+    enum imageSelected {cover, profile};
+    EditProfileActivity.imageSelected mImageSelected;
 
     //Foto 1
     String mAbsolutePhotoPath;
@@ -107,7 +110,7 @@ public class EditProfileActivity extends AppCompatActivity {
         mCircleImageViewProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                imageSelected = 1;
+                mImageSelected = imageSelected.profile;
                 selectOptionImage();
             }
         });
@@ -115,7 +118,7 @@ public class EditProfileActivity extends AppCompatActivity {
         mImageViewCover.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                imageSelected = 2;
+                mImageSelected = imageSelected.cover;
                 selectOptionImage();
             }
         });
@@ -126,7 +129,40 @@ public class EditProfileActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        getUser();
     }
+
+    private void getUser() {
+        mUserProvider.getUser(mAuthProvider.getUid()).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if(documentSnapshot.exists()) {
+                    if(documentSnapshot.contains("username")) {
+                        mUsername = documentSnapshot.getString("username");
+                        mTextInputUserName.setText(mUsername);
+                    }
+                    if(documentSnapshot.contains("phone")) {
+                        mPhone = documentSnapshot.getString("phone");
+                        mTextInputPhone.setText(mPhone);
+                    }
+                    if(documentSnapshot.contains("image_profile")) {
+                        mImageProfile = documentSnapshot.getString("image_profile");
+                        if(mImageProfile != null && !mImageProfile.isEmpty()) {
+                            Picasso.with(EditProfileActivity.this).load(mImageProfile).into(mCircleImageViewProfile);
+                        }
+                    }
+                    if(documentSnapshot.contains("image_cover")) {
+                        mImageCover = documentSnapshot.getString("image_cover");
+                        if(mImageCover != null && !mImageCover.isEmpty()) {
+                            Picasso.with(EditProfileActivity.this).load(mImageCover).into(mImageViewCover);
+                        }
+                    }
+                }
+            }
+        });
+    }
+
 
     private void clickEditProfile() {
         mUsername = mTextInputUserName.getText().toString();
@@ -135,23 +171,41 @@ public class EditProfileActivity extends AppCompatActivity {
         if(!mUsername.isEmpty() && !mPhone.isEmpty())
         {
             //2 GALERIA.
-            if(mImageFile!= null && mImageFile2!= null) {
-                saveImage(mImageFile, mImageFile2);
+            if(mImageFile!= null && mImageFile2!= null) {//mImageFile: galeria. mPhotoFile: camara.
+                saveImageCoverAndProfile(mImageFile, mImageFile2);
             }
             //2 CAMARA.
             else if(mPhotoFile != null && mPhotoFile2!= null){
-                saveImage(mPhotoFile, mPhotoFile2);
+                saveImageCoverAndProfile(mPhotoFile, mPhotoFile2);
             }
             //1 CAMARA, 2 GALERIA.
             else if(mPhotoFile != null && mImageFile2!= null){
-                saveImage(mPhotoFile, mImageFile2);
+                saveImageCoverAndProfile(mPhotoFile, mImageFile2);
             }
             //1 GALERIA, 2 CAMARA.
             else if(mImageFile != null && mPhotoFile2!= null){
-                saveImage(mPhotoFile, mPhotoFile2);
+                saveImageCoverAndProfile(mImageFile, mPhotoFile2);
             }
-            else {
-                Toast.makeText(this, "Imagenes vacías.", Toast.LENGTH_LONG).show();
+            else if(mPhotoFile != null) {
+                saveImage(mPhotoFile, true);
+            }
+            else if(mPhotoFile2 != null) {
+                saveImage(mPhotoFile2, false);
+            }
+            else if(mImageFile != null) {
+                saveImage(mImageFile, true);
+            }
+            else if (mImageFile2 != null) {
+                saveImage(mImageFile2, false);
+            }
+            else {//userName o Phone.
+                User user = new User();
+                user.setUsername(mUsername);
+                user.setPhone(mPhone);
+                user.setImageProfile(mImageProfile);
+                user.setImageCover(mImageCover);
+                user.setId(mAuthProvider.getUid());
+                updateInfo(user);
             }
         }
         else{
@@ -159,7 +213,7 @@ public class EditProfileActivity extends AppCompatActivity {
         }
     }
 
-    private void saveImage(File _mImageFile1, File _mImageFile2) {
+    private void saveImageCoverAndProfile(File _mImageFile1, File _mImageFile2) {
         mDialog.show();
         mDialog.setMessage("Guardando");
         mImageProvider.save(EditProfileActivity.this, _mImageFile1).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
@@ -186,18 +240,7 @@ public class EditProfileActivity extends AppCompatActivity {
                                                 user.setImageProfile(urlProfile);
                                                 user.setImageCover(urlCover);
                                                 user.setId(mAuthProvider.getUid());
-                                                mUserProvider.update(user).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                        mDialog.dismiss();
-                                                        if(task.isSuccessful()){
-                                                            Toast.makeText(EditProfileActivity.this, "La información se actualizó correctamente", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                        else {
-                                                            Toast.makeText(EditProfileActivity.this, "La información no se pudo actualizar.", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    }
-                                                });
+                                                updateInfo(user);
 
                                             }
                                         });
@@ -222,16 +265,71 @@ public class EditProfileActivity extends AppCompatActivity {
         });
     }
 
+    private void saveImage(File image, boolean isProfileImage) {
+        mDialog.show();
+        mDialog.setMessage("Guardando");
+        mImageProvider.save(EditProfileActivity.this, image).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                if(task.isSuccessful()) {
+                    mImageProvider.getStorage().getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            final String url = uri.toString();
+                            User user = new User();
+                            user.setUsername(mUsername);
+                            user.setPhone(mPhone);
+                            if(isProfileImage){
+                                user.setImageProfile(url);
+                                user.setImageCover(mImageCover);
+                            }
+                            else{
+                                user.setImageCover(url);
+                                user.setImageProfile(mImageProfile);
+                            }
+                            user.setId(mAuthProvider.getUid());
+                            updateInfo(user);
+                        }
+                    });
+                }
+                else {
+                    mDialog.dismiss();
+                    Toast.makeText(EditProfileActivity.this, "Hubo un error al almacenar la imagen de perfil."+ task.getException(), Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+    }
+
+    private void updateInfo(User user) {
+        if(!mDialog.isShowing()) {
+            mDialog.show();
+            mDialog.setMessage("Guardando");
+        }
+        mUserProvider.update(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                mDialog.dismiss();
+                if(task.isSuccessful()){
+                    Toast.makeText(EditProfileActivity.this, "La información se actualizó correctamente", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Toast.makeText(EditProfileActivity.this, "La información no se pudo actualizar.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
     private void selectOptionImage() {
         mBuilderSelector.setItems(options, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int i) {
                 if(i == 0) {
-                    mFuenteImagen = fuenteImagen.profile;
+                    mFuenteImagen = fuenteImagen.galeria;
                     openGallery();
                 }
                 else if(i==1) {
-                    mFuenteImagen = fuenteImagen.cover;
+                    mFuenteImagen = fuenteImagen.camara;
                     takePhoto();
                 }
             }
@@ -265,11 +363,11 @@ public class EditProfileActivity extends AppCompatActivity {
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File photoFile = File.createTempFile(new Date() + "_photo", ".jpg", storageDir);
 
-        if(imageSelected == 1) {
+        if(mImageSelected == imageSelected.profile) {
             mPhotoPath = "file:" + photoFile.getAbsolutePath();
             mAbsolutePhotoPath = photoFile.getAbsolutePath();
         }
-        else if(imageSelected == 2) {
+        else if(mImageSelected == imageSelected.cover) {
             mPhotoPath2 = "file:" + photoFile.getAbsolutePath();
             mAbsolutePhotoPath2 = photoFile.getAbsolutePath();
         }
@@ -292,40 +390,47 @@ public class EditProfileActivity extends AppCompatActivity {
                             Intent data = activityResult.getData();
 
                             //Result returned from launching the Intent
-                            if (requestCode == RESULT_OK && imageSelected == 1 && mFuenteImagen == fuenteImagen.profile) {
-                                try {
-                                    mPhotoFile= null;
-                                    mImageFile = FileUtil.from(EditProfileActivity.this, data.getData());//Nos transforma la URI de la imagen en el archivo (Creo).
-                                    mCircleImageViewProfile.setImageBitmap(BitmapFactory.decodeFile(mImageFile.getAbsolutePath()));
-
-                                } catch (Exception e) {
-                                    Log.w("ERROR", "Gallery 1 Intent failed, error: ", e);
-                                    Toast.makeText(EditProfileActivity.this, "Error al cargar la imagen 1", Toast.LENGTH_SHORT).show();
+                            if(requestCode == RESULT_OK)
+                            {
+                                switch (mFuenteImagen)
+                                {
+                                    case galeria:
+                                        if (mImageSelected == imageSelected.profile) {//profile
+                                            try {
+                                                mPhotoFile= null;
+                                                mImageFile = FileUtil.from(EditProfileActivity.this, data.getData());//Nos transforma la URI de la imagen en el archivo (Creo).
+                                                mCircleImageViewProfile.setImageBitmap(BitmapFactory.decodeFile(mImageFile.getAbsolutePath()));
+                                            } catch (Exception e) {
+                                                Log.w("ERROR", "Gallery profile Intent failed, error: ", e);
+                                                Toast.makeText(EditProfileActivity.this, "Error al cargar la imagen de perfil", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                        else { //cover
+                                            try {
+                                                mPhotoFile2 = null;
+                                                mImageFile2 = FileUtil.from(EditProfileActivity.this, data.getData());
+                                                mImageViewCover.setImageBitmap(BitmapFactory.decodeFile(mImageFile2.getAbsolutePath()));
+                                            } catch (Exception e) {
+                                                Log.w("ERROR", "Gallery 2 Intent failed, error: ", e);
+                                                Toast.makeText(EditProfileActivity.this, "Error al cargar la imagen 2", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                        break;
+                                    case camara:
+                                        if (mImageSelected == imageSelected.profile) {//profile
+                                            mImageFile = null;
+                                            mPhotoFile = new File(mAbsolutePhotoPath);
+                                            Picasso.with(EditProfileActivity.this).load(mPhotoPath).into(mCircleImageViewProfile);
+                                        }
+                                        else { //cover
+                                            mImageFile2 = null;
+                                            mPhotoFile2 = new File(mAbsolutePhotoPath2);
+                                            Picasso.with(EditProfileActivity.this).load(mPhotoPath2).into(mImageViewCover);
+                                        }
+                                        break;
+                                    default:
+                                        Toast.makeText(EditProfileActivity.this, "Error valor imageSelected", Toast.LENGTH_SHORT).show();
                                 }
-                            }
-                            else if (requestCode == RESULT_OK && imageSelected == 2 && mFuenteImagen == fuenteImagen.profile) {
-                                try {
-                                    mPhotoFile2 = null;
-                                    mImageFile2 = FileUtil.from(EditProfileActivity.this, data.getData());//Nos transforma la URI de la imagen en el archivo (Creo).
-                                    mImageViewCover.setImageBitmap(BitmapFactory.decodeFile(mImageFile2.getAbsolutePath()));
-                                } catch (Exception e) {
-                                    Log.w("ERROR", "Gallery 2 Intent failed, error: ", e);
-                                    Toast.makeText(EditProfileActivity.this, "Error al cargar la imagen 2", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                            else if(requestCode == RESULT_OK && mFuenteImagen == fuenteImagen.cover) { //Imagen de la camara.
-                                if(imageSelected == 1) {
-                                    mImageFile = null;
-                                    mPhotoFile = new File(mAbsolutePhotoPath);
-                                    Picasso.with(EditProfileActivity.this).load(mPhotoPath).into(mCircleImageViewProfile);
-                                }
-                                else if(imageSelected == 2) {
-                                    mImageFile2 = null;
-                                    mPhotoFile2 = new File(mAbsolutePhotoPath2);
-                                    Picasso.with(EditProfileActivity.this).load(mPhotoPath2).into(mImageViewCover);
-                                }
-                                else
-                                    Toast.makeText(EditProfileActivity.this, "Error valor imageSelected", Toast.LENGTH_SHORT).show();
                             }
                             else {
                                 Toast.makeText(EditProfileActivity.this, "Error al cargar la imagen de la camara", Toast.LENGTH_SHORT).show();
@@ -333,5 +438,4 @@ public class EditProfileActivity extends AppCompatActivity {
                         }
                     }
             );
-
 }
