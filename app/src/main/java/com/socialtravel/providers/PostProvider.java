@@ -22,4 +22,8 @@ public class PostProvider {
     public Query getAll(){
         return mCollection.orderBy("title", Query.Direction.DESCENDING);
     }
+
+    public Query getPostByUser(String id) {
+        return mCollection.whereEqualTo("idUser", id); //Busca todos los post donde el idUser = id.
+    }
 }

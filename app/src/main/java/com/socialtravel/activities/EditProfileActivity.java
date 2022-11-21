@@ -296,7 +296,6 @@ public class EditProfileActivity extends AppCompatActivity {
                     mDialog.dismiss();
                     Toast.makeText(EditProfileActivity.this, "Hubo un error al almacenar la imagen de perfil."+ task.getException(), Toast.LENGTH_SHORT).show();
                 }
-
             }
         });
     }
