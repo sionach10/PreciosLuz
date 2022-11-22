@@ -4,11 +4,12 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-
+        jcenter()
+        maven { url 'https://jitpack.io' }
+        maven { url "https://jcenter.bintray.com" }
     }
     dependencies {
         classpath 'com.google.gms:google-services:4.3.13'
-
     }
 }
 plugins {
