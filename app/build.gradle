@@ -52,12 +52,11 @@ dependencies {
     implementation('id.zelory:compressor:2.1.0') {
         exclude module: 'unspecified'
     }
-    implementation 'com.github.smarteist:autoimageslider:1.4.0'
+    implementation 'com.github.smarteist:Android-Image-Slider:1.4.0'
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation 'com.firebaseui:firebase-ui-firestore:8.0.2'
     implementation 'com.github.d-max:spots-dialog:0.7@aar'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
-
 }
