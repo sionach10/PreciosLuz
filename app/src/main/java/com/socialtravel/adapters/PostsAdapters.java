@@ -13,11 +13,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.socialtravel.R;
 import com.socialtravel.activities.PostDetailActivity;
 import com.socialtravel.models.Post;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+
+import java.lang.annotation.Documented;
 
 
 public class PostsAdapters extends FirestoreRecyclerAdapter <Post, PostsAdapters.ViewHolder> {
@@ -30,6 +33,9 @@ public class PostsAdapters extends FirestoreRecyclerAdapter <Post, PostsAdapters
 
     @Override
     protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull Post post) {
+
+        DocumentSnapshot document = getSnapshots().getSnapshot(position);
+        final String postId = document.getId();
         holder.textViewTitle.setText(post.getTitle());
         holder.textViewDescription.setText(post.getDescription());
         if(post.getImage1()!= null) {
@@ -41,6 +47,7 @@ public class PostsAdapters extends FirestoreRecyclerAdapter <Post, PostsAdapters
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, PostDetailActivity.class);//Origen y destino.
+                intent.putExtra("id", postId);
                 context.startActivity(intent);
             }
         });
