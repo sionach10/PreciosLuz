@@ -9,6 +9,9 @@
     <color name="white">#FFFFFFFF</color>
     <color name="gris">#AAA8A8</color>
     <color name="azul_oscuro">#001B35</color>
+    <color name="gris_claro">#BFBFBF</color>
     <color name="gris_oscuro">#606060</color>
+    <color name="rojo">#BF0000</color>
+
 
 </resources>
