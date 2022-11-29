@@ -2,16 +2,23 @@ package com.socialtravel.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.api.Distribution;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
 import com.smarteist.autoimageslider.SliderAnimations;
@@ -48,6 +55,7 @@ public class PostDetailActivity extends AppCompatActivity {
     Button mButtonShowProfile;
     CircleImageView mCircleImageViewBack;
     String mIdUser = "";
+    FloatingActionButton mFabComment;
 
 
 
@@ -68,12 +76,20 @@ public class PostDetailActivity extends AppCompatActivity {
         mCircleImageViewProfile = findViewById(R.id.circleImageProfile);
         mButtonShowProfile = findViewById(R.id.btnShowProfile);
         mCircleImageViewBack = findViewById(R.id.circleImageBack);
+        mFabComment = findViewById(R.id.fabComment);
 
         mPostProvider = new PostProvider();
         mUserProvider = new UserProvider();
         mExtraPostId = getIntent().getStringExtra("id");
 
         getPost();
+
+        mFabComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialogComment();
+            }
+        });
 
         mCircleImageViewBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,6 +104,48 @@ public class PostDetailActivity extends AppCompatActivity {
                 goToShowProfile();
             }
         });
+    }
+
+    private void showDialogComment() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(PostDetailActivity.this);
+        alert.setTitle("¡COMENTARIO!");
+        alert.setMessage("Ingresa tu comentario");
+
+        EditText editText = new EditText(PostDetailActivity.this);
+        editText.setHint("texto");
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+
+        );
+        params.setMargins(36,0,36,36);
+        editText.setLayoutParams(params);
+
+        RelativeLayout container = new RelativeLayout(PostDetailActivity.this);
+
+        RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.MATCH_PARENT,
+            RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+        container.setLayoutParams(relativeParams);
+        container.addView(editText);
+
+        alert.setView(container);
+
+        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String value = editText.getText().toString();
+            }
+        });
+        alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        alert.show();
     }
 
     private void goToShowProfile() {

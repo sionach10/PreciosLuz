@@ -109,7 +109,7 @@ public class PostActivity extends AppCompatActivity {
         mImageViewXbox = findViewById(R.id.imageViewXbox);
         mImageViewNintendo = findViewById(R.id.imageViewNintendo);
         mTextViewCategory = findViewById(R.id.textViewCategory);
-        mCircleImageBack = findViewById(R.id.circle_image_back);
+        mCircleImageBack = findViewById(R.id.circleImageBack);
 
         mCircleImageBack.setOnClickListener(new View.OnClickListener() {
             @Override
