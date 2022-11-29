@@ -1,5 +1,6 @@
 package com.socialtravel.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
@@ -16,7 +17,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.api.Distribution;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -25,12 +28,16 @@ import com.smarteist.autoimageslider.SliderAnimations;
 import com.smarteist.autoimageslider.SliderView;
 import com.socialtravel.R;
 import com.socialtravel.adapters.SliderAdapter;
+import com.socialtravel.models.Comment;
 import com.socialtravel.models.SliderItem;
+import com.socialtravel.providers.AuthProvider;
+import com.socialtravel.providers.CommentsProvider;
 import com.socialtravel.providers.PostProvider;
 import com.socialtravel.providers.UserProvider;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -43,8 +50,10 @@ public class PostDetailActivity extends AppCompatActivity {
     List<SliderItem> mSliderItems = new ArrayList<>();
     PostProvider mPostProvider;
     UserProvider mUserProvider;
-    String mExtraPostId;
+    AuthProvider mAuthProvider;
+    CommentsProvider mCommentsProvider;
 
+    String mExtraPostId;
     TextView mTextViewTitle;
     TextView mTextViewDescription;
     TextView mTextViewUsername;
@@ -77,10 +86,13 @@ public class PostDetailActivity extends AppCompatActivity {
         mButtonShowProfile = findViewById(R.id.btnShowProfile);
         mCircleImageViewBack = findViewById(R.id.circleImageBack);
         mFabComment = findViewById(R.id.fabComment);
+        mExtraPostId = getIntent().getStringExtra("id");
 
         mPostProvider = new PostProvider();
         mUserProvider = new UserProvider();
-        mExtraPostId = getIntent().getStringExtra("id");
+        mAuthProvider = new AuthProvider();
+        mCommentsProvider = new CommentsProvider();
+
 
         getPost();
 
@@ -137,6 +149,12 @@ public class PostDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String value = editText.getText().toString();
+                if(!value.isEmpty()) {
+                    createComment(value);
+                }
+                else {
+                    Toast.makeText(PostDetailActivity.this, "Debe ingresar un comentario.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         alert.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
@@ -146,6 +164,25 @@ public class PostDetailActivity extends AppCompatActivity {
             }
         });
         alert.show();
+    }
+
+    private void createComment(String value) {
+        Comment comment = new Comment();
+        comment.setComment(value);
+        comment.setIdPost(mExtraPostId);
+        comment.setIdUser(mAuthProvider.getUid());
+        comment.setTimestamp(new Date().getTime());
+        mCommentsProvider.create(comment).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()) {
+                    Toast.makeText(PostDetailActivity.this, "El comentario se creó correctamente.", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Toast.makeText(PostDetailActivity.this, "Error al guardar el comentario.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void goToShowProfile() {
