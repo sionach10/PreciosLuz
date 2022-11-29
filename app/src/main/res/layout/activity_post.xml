@@ -318,11 +318,15 @@
         />
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/circle_image_back"
+        android:id="@+id/circleImageBack"
         android:layout_width="40dp"
-        android:layout_height="30dp"
-        android:src="@drawable/ic_flecha_atras_post"
-        android:layout_marginTop="17dp"
-        android:layout_marginLeft="30dp"/>
+        android:layout_height="40dp"
+        android:src="@drawable/ic_arrow_left"
+        app:civ_circle_background_color="@color/white"
+        app:civ_border_color="@color/design_default_color_primary"
+        app:civ_border_width="1dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="30dp"
+        android:scaleType="centerCrop"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

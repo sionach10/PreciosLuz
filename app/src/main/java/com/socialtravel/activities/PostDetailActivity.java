@@ -2,11 +2,14 @@ package com.socialtravel.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -43,6 +46,8 @@ public class PostDetailActivity extends AppCompatActivity {
     ImageView mImageViewCategory;
     CircleImageView mCircleImageViewProfile;
     Button mButtonShowProfile;
+    CircleImageView mCircleImageViewBack;
+    String mIdUser = "";
 
 
 
@@ -62,12 +67,39 @@ public class PostDetailActivity extends AppCompatActivity {
         mImageViewCategory = findViewById(R.id.imageViewCategory);
         mCircleImageViewProfile = findViewById(R.id.circleImageProfile);
         mButtonShowProfile = findViewById(R.id.btnShowProfile);
+        mCircleImageViewBack = findViewById(R.id.circleImageBack);
 
         mPostProvider = new PostProvider();
         mUserProvider = new UserProvider();
         mExtraPostId = getIntent().getStringExtra("id");
 
         getPost();
+
+        mCircleImageViewBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        mButtonShowProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToShowProfile();
+            }
+        });
+    }
+
+    private void goToShowProfile() {
+        if(!mIdUser.equals("")) {
+            Intent intent = new Intent(PostDetailActivity.this, UserProfileActivity.class);
+            intent.putExtra("idUser", mIdUser);
+            startActivity(intent);
+        }
+        else {
+            Toast.makeText(this, "El id del usuario aún no se ha cargado.", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     private void instanceSlider() {
@@ -127,11 +159,9 @@ public class PostDetailActivity extends AppCompatActivity {
                         }
                     }
                     if(documentSnapshot.contains("idUser")) {
-                        String idUser = documentSnapshot.getString("idUser");
-                        getUserInfo(idUser);
+                        mIdUser = documentSnapshot.getString("idUser");
+                        getUserInfo(mIdUser);
                     }
-
-
                     instanceSlider();
                 }
             }
