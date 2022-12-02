@@ -18,15 +18,12 @@ import com.socialtravel.R;
 import com.socialtravel.activities.PostDetailActivity;
 import com.socialtravel.models.Post;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
-
-import java.lang.annotation.Documented;
 
 
-public class PostsAdapters extends FirestoreRecyclerAdapter <Post, PostsAdapters.ViewHolder> {
+public class PostsAdapter extends FirestoreRecyclerAdapter <Post, PostsAdapter.ViewHolder> {
 
     Context context;
-    public PostsAdapters (FirestoreRecyclerOptions<Post> options, Context context) {
+    public PostsAdapter(FirestoreRecyclerOptions<Post> options, Context context) {
         super(options);
         this.context = context;
     }

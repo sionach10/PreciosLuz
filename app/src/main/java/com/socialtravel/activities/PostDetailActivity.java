@@ -1,8 +1,5 @@
 package com.socialtravel.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,16 +14,23 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.api.Distribution;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.Query;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
 import com.smarteist.autoimageslider.SliderAnimations;
 import com.smarteist.autoimageslider.SliderView;
 import com.socialtravel.R;
+import com.socialtravel.adapters.CommentAdapter;
 import com.socialtravel.adapters.SliderAdapter;
 import com.socialtravel.models.Comment;
 import com.socialtravel.models.SliderItem;
@@ -39,7 +43,6 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -52,6 +55,7 @@ public class PostDetailActivity extends AppCompatActivity {
     UserProvider mUserProvider;
     AuthProvider mAuthProvider;
     CommentsProvider mCommentsProvider;
+    CommentAdapter mCommentsAdapter;
 
     String mExtraPostId;
     TextView mTextViewTitle;
@@ -65,6 +69,7 @@ public class PostDetailActivity extends AppCompatActivity {
     CircleImageView mCircleImageViewBack;
     String mIdUser = "";
     FloatingActionButton mFabComment;
+    RecyclerView mRecyclerView;
 
 
 
@@ -87,6 +92,10 @@ public class PostDetailActivity extends AppCompatActivity {
         mCircleImageViewBack = findViewById(R.id.circleImageBack);
         mFabComment = findViewById(R.id.fabComment);
         mExtraPostId = getIntent().getStringExtra("id");
+        mRecyclerView = findViewById(R.id.recyclerViewComment);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(PostDetailActivity.this);//para que me ponga las tarjetas una debajo de otra.
+        mRecyclerView.setLayoutManager(linearLayoutManager);
 
         mPostProvider = new PostProvider();
         mUserProvider = new UserProvider();
@@ -116,6 +125,25 @@ public class PostDetailActivity extends AppCompatActivity {
                 goToShowProfile();
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        Query query = mCommentsProvider.getCommentByPost(mExtraPostId);
+        FirestoreRecyclerOptions<Comment> options = new FirestoreRecyclerOptions.Builder<Comment>()
+                .setQuery(query, Comment.class).build();
+
+        mCommentsAdapter = new CommentAdapter(options, PostDetailActivity.this);
+        mRecyclerView.setAdapter(mCommentsAdapter);
+        mCommentsAdapter.startListening();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mCommentsAdapter.stopListening();
     }
 
     private void showDialogComment() {

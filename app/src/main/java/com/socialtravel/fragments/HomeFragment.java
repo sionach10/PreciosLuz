@@ -19,13 +19,11 @@ import android.view.ViewGroup;
 
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.firestore.Query;
 import com.socialtravel.R;
-import com.socialtravel.activities.HomeActivity;
 import com.socialtravel.activities.MainActivity;
 import com.socialtravel.activities.PostActivity;
-import com.socialtravel.adapters.PostsAdapters;
+import com.socialtravel.adapters.PostsAdapter;
 import com.socialtravel.models.Post;
 import com.socialtravel.providers.AuthProvider;
 import com.socialtravel.providers.PostProvider;
@@ -38,7 +36,7 @@ public class HomeFragment extends Fragment {
     AuthProvider mAuthProvider;
     RecyclerView mRecyclerView;
     PostProvider mPostProvider;
-    PostsAdapters mPostAdapter;
+    PostsAdapter mPostAdapter;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -78,7 +76,7 @@ public class HomeFragment extends Fragment {
         FirestoreRecyclerOptions<Post> options = new FirestoreRecyclerOptions.Builder<Post>()
                 .setQuery(query, Post.class).build();
 
-        mPostAdapter = new PostsAdapters(options, getContext());
+        mPostAdapter = new PostsAdapter(options, getContext());
         mRecyclerView.setAdapter(mPostAdapter);
         mPostAdapter.startListening();
     }
