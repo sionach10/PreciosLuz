@@ -68,11 +68,13 @@
             android:layout_marginBottom="10dp">
 
             <ImageView
+                android:id="@+id/imageViewLike"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
                 android:src="@drawable/icon_like_gray"/>
 
             <TextView
+                android:id="@+id/textViewLikes"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"

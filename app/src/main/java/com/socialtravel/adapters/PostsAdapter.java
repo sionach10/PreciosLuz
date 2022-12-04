@@ -2,6 +2,7 @@ package com.socialtravel.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.icu.lang.UCharacter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,19 +10,26 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.socialtravel.R;
 import com.socialtravel.activities.PostDetailActivity;
+import com.socialtravel.models.Like;
 import com.socialtravel.models.Post;
-import com.socialtravel.providers.PostProvider;
+import com.socialtravel.providers.AuthProvider;
+import com.socialtravel.providers.LikesProvider;
 import com.socialtravel.providers.UserProvider;
 import com.squareup.picasso.Picasso;
 
+import java.util.Date;
 import java.util.Locale;
 
 
@@ -29,16 +37,20 @@ public class PostsAdapter extends FirestoreRecyclerAdapter <Post, PostsAdapter.V
 
     Context context;
     UserProvider mUserProvider;
+    LikesProvider mLikesProvider;
+    AuthProvider mAuthProvider;
 
 
     public PostsAdapter(FirestoreRecyclerOptions<Post> options, Context context) {
         super(options);
         this.context = context;
         mUserProvider = new UserProvider();
+        mLikesProvider = new LikesProvider();
+        mAuthProvider = new AuthProvider();
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull Post post) {
+    protected void onBindViewHolder(@NonNull final ViewHolder holder, int position, @NonNull Post post) {
 
         DocumentSnapshot document = getSnapshots().getSnapshot(position);
         final String postId = document.getId();
@@ -60,7 +72,68 @@ public class PostsAdapter extends FirestoreRecyclerAdapter <Post, PostsAdapter.V
             }
         });
 
+        holder.imageViewLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Like like = new Like();
+                like.setIdUser(mAuthProvider.getUid());
+                like.setIdPost(postId);
+                like.setTimestamp(new Date().getTime());
+                like(like, holder);
+            }
+        });
+
         getUserInfo(post.getIdUser(), holder);
+        getNumberLikesByPost(postId, holder);
+        checkifExistLike(postId, mAuthProvider.getUid(), holder);
+    }
+
+    private void getNumberLikesByPost(String idPost, ViewHolder holder) {
+        mLikesProvider.getLikesByPost(idPost).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                int numberLikes = value.size();//TODO: al cerrar sesión tengo un puntero nulo.
+                holder.textViewLikes.setText(String.valueOf((numberLikes)) + " likes.");
+            }
+        });
+    }
+
+
+    private void like(final Like like, ViewHolder holder) {
+        mLikesProvider.getLikeByPostAndUser(like.getIdPost(), mAuthProvider.getUid()).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                int numberDocuments = queryDocumentSnapshots.size();
+                if(numberDocuments > 0) {
+                    String idLike = queryDocumentSnapshots.getDocuments().get(0).getId();//Solo hay un documento filtrado.
+                    holder.imageViewLike.setImageResource(R.drawable.icon_like_gray);
+                    mLikesProvider.delete(idLike);
+                }
+                else {
+                    holder.imageViewLike.setImageResource(R.drawable.icon_like_blue);
+                    mLikesProvider.create(like);
+                }
+
+            }
+        });
+
+    }
+
+    private void checkifExistLike(String idPost, String idUser, ViewHolder holder) { //Para pintar el like en azul o en gris al entrar en la app.
+        mLikesProvider.getLikeByPostAndUser(idPost, idUser).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                int numberDocuments = queryDocumentSnapshots.size();
+                if(numberDocuments > 0) {
+                    holder.imageViewLike.setImageResource(R.drawable.icon_like_blue);
+                }
+                else {
+                    holder.imageViewLike.setImageResource(R.drawable.icon_like_gray);
+                }
+
+            }
+        });
+
     }
 
     private void getUserInfo(String idUser, ViewHolder holder) {
@@ -88,7 +161,9 @@ public class PostsAdapter extends FirestoreRecyclerAdapter <Post, PostsAdapter.V
         TextView textViewTitle;
         TextView textViewDescription;
         TextView textViewUsername;
+        TextView textViewLikes;
         ImageView imageViewPost;
+        ImageView imageViewLike;
         View viewHolder;
 
         public ViewHolder(View view) {
@@ -96,7 +171,9 @@ public class PostsAdapter extends FirestoreRecyclerAdapter <Post, PostsAdapter.V
             textViewTitle = view.findViewById(R.id.textViewTitlePostCard);
             textViewDescription = view.findViewById(R.id.textViewDescriptionPostCard);
             textViewUsername = view.findViewById(R.id.textViewUsernamePostCard);
+            textViewLikes = view.findViewById(R.id.textViewLikes);
             imageViewPost = view.findViewById(R.id.imageViewPostCard);
+            imageViewLike = view.findViewById(R.id.imageViewLike);
             viewHolder = view;
         }
     }

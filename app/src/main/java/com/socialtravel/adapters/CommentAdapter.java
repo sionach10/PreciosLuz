@@ -22,6 +22,8 @@ import com.socialtravel.models.Post;
 import com.socialtravel.providers.UserProvider;
 import com.squareup.picasso.Picasso;
 
+import java.util.Locale;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
@@ -54,7 +56,7 @@ public class CommentAdapter extends FirestoreRecyclerAdapter <Comment, CommentAd
                 if(documentSnapshot.exists()) {
                     if(documentSnapshot.contains("username")) {
                         String username = documentSnapshot.getString("username");
-                        holder.textViewUsername.setText(username);
+                        holder.textViewUsername.setText(username.toUpperCase(Locale.ROOT));
                     }
                     if(documentSnapshot.contains("image_profile")) {
                         String imageProfile = documentSnapshot.getString("image_profile");
