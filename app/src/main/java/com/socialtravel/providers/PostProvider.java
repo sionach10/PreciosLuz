@@ -30,4 +30,8 @@ public class PostProvider {
     public Task<DocumentSnapshot> getPostById(String id) {
         return mCollection.document(id).get();
     }
+
+    public Task<Void> delete(String id) {
+        return mCollection.document(id).delete();
+    }
 }

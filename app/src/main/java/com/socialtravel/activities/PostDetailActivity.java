@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,7 +26,10 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
 import com.smarteist.autoimageslider.SliderAnimations;
 import com.smarteist.autoimageslider.SliderView;
@@ -36,8 +40,10 @@ import com.socialtravel.models.Comment;
 import com.socialtravel.models.SliderItem;
 import com.socialtravel.providers.AuthProvider;
 import com.socialtravel.providers.CommentsProvider;
+import com.socialtravel.providers.LikesProvider;
 import com.socialtravel.providers.PostProvider;
 import com.socialtravel.providers.UserProvider;
+import com.socialtravel.utils.RelativeTime;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -50,30 +56,30 @@ public class PostDetailActivity extends AppCompatActivity {
 
     SliderView mSliderView;
     SliderAdapter mSliderAdapter;
+    CommentAdapter mCommentsAdapter;
     List<SliderItem> mSliderItems = new ArrayList<>();
+
     PostProvider mPostProvider;
     UserProvider mUserProvider;
     AuthProvider mAuthProvider;
     CommentsProvider mCommentsProvider;
-    CommentAdapter mCommentsAdapter;
+    LikesProvider mLikesProvider;
 
     String mExtraPostId;
+    String mIdUser = "";
     TextView mTextViewTitle;
     TextView mTextViewDescription;
     TextView mTextViewUsername;
     TextView mTextViewPhone;
     TextView mTextViewNameCategory;
+    TextView mTextViewRelativeTime;
+    TextView mTextViewLikes;
     ImageView mImageViewCategory;
     CircleImageView mCircleImageViewProfile;
-    Button mButtonShowProfile;
     CircleImageView mCircleImageViewBack;
-    String mIdUser = "";
+    Button mButtonShowProfile;
     FloatingActionButton mFabComment;
     RecyclerView mRecyclerView;
-
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +92,8 @@ public class PostDetailActivity extends AppCompatActivity {
         mTextViewUsername = findViewById(R.id.textViewUsername);
         mTextViewPhone = findViewById(R.id.textViewPhone);
         mTextViewNameCategory = findViewById(R.id.textViewNameCategory);
+        mTextViewRelativeTime = findViewById(R.id.textViewRelativeTime);
+        mTextViewLikes = findViewById(R.id.textViewLikes);
         mImageViewCategory = findViewById(R.id.imageViewCategory);
         mCircleImageViewProfile = findViewById(R.id.circleImageProfile);
         mButtonShowProfile = findViewById(R.id.btnShowProfile);
@@ -101,9 +109,7 @@ public class PostDetailActivity extends AppCompatActivity {
         mUserProvider = new UserProvider();
         mAuthProvider = new AuthProvider();
         mCommentsProvider = new CommentsProvider();
-
-
-        getPost();
+        mLikesProvider = new LikesProvider();
 
         mFabComment.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,6 +129,27 @@ public class PostDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 goToShowProfile();
+            }
+        });
+
+        getPost();
+        getNumberLikes();
+    }
+
+    private void getNumberLikes() {
+        mLikesProvider.getLikesByPost(mExtraPostId).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                mLikesProvider.getLikesByPost(mExtraPostId).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        int numberLikes = queryDocumentSnapshots.size();
+                        if(numberLikes ==1)
+                            mTextViewLikes.setText(numberLikes + " like");
+                        else
+                            mTextViewLikes.setText(numberLikes + " likes");
+                    }
+                });
             }
         });
     }
@@ -284,6 +311,11 @@ public class PostDetailActivity extends AppCompatActivity {
                     if(documentSnapshot.contains("idUser")) {
                         mIdUser = documentSnapshot.getString("idUser");
                         getUserInfo(mIdUser);
+                    }
+                    if(documentSnapshot.contains("timestamp")) {
+                        long timestamp = documentSnapshot.getLong("timestamp");
+                        String relativeTime = RelativeTime.getTimeAgo(timestamp, PostDetailActivity.this);
+                        mTextViewRelativeTime.setText(relativeTime);
                     }
                     instanceSlider();
                 }

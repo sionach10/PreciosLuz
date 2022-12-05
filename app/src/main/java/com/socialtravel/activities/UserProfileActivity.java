@@ -1,17 +1,27 @@
 package com.socialtravel.activities;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.socialtravel.R;
+import com.socialtravel.adapters.MyPostAdapter;
+import com.socialtravel.models.Post;
 import com.socialtravel.providers.AuthProvider;
 import com.socialtravel.providers.PostProvider;
 import com.socialtravel.providers.UserProvider;
@@ -21,19 +31,23 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class UserProfileActivity extends AppCompatActivity {
 
+    String mExtraIdUser;
     LinearLayout mLinearLayoutEditProfile;
     TextView mTextViewUsername;
     TextView mTextViewPhone;
     TextView mTextViewEmail;
     TextView mTextViewPostNumber;
+    TextView mTextViewPostExist;
     ImageView mImageViewCover;
     CircleImageView mCircleImageProfile;
-    String mExtraIdUser;
     CircleImageView mCircleImageViewBack;
+    RecyclerView mRecyclerView;
 
     UserProvider mUserProvider;
     AuthProvider mAuthProvider;
     PostProvider mPostProvider;
+
+    MyPostAdapter mAdapter;
 
 
 
@@ -47,13 +61,21 @@ public class UserProfileActivity extends AppCompatActivity {
         mTextViewUsername = findViewById(R.id.textViewUsername);
         mTextViewPhone = findViewById(R.id.textViewPhone);
         mTextViewPostNumber = findViewById(R.id.textViewPostNumber);
+        mTextViewPostExist = findViewById(R.id.textViewPostExist);
         mCircleImageProfile = findViewById(R.id.circleImageProfile);
         mImageViewCover = findViewById(R.id.imageViewCover);
         mCircleImageViewBack = findViewById(R.id.circleImageBack);
+        mRecyclerView = findViewById(R.id.recyclerViewMyPost);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(UserProfileActivity.this);//para que me ponga las tarjetas una debajo de otra.
+        mRecyclerView.setLayoutManager(linearLayoutManager);
+
 
         mUserProvider = new UserProvider();
         mAuthProvider = new AuthProvider();
         mPostProvider = new PostProvider();
+
+        MyPostAdapter mAdapter;
 
         mExtraIdUser = getIntent().getStringExtra("idUser");
 
@@ -68,7 +90,43 @@ public class UserProfileActivity extends AppCompatActivity {
 
         getUser();
         getPostNumber();
+        checkIfExistPost();
 
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Query query = mPostProvider.getPostByUser(mExtraIdUser);//Devuelve todos los Post ordenador por timestamp.
+        FirestoreRecyclerOptions<Post> options = new FirestoreRecyclerOptions.Builder<Post>()
+                .setQuery(query, Post.class).build();
+
+        mAdapter = new MyPostAdapter(options, UserProfileActivity.this);
+        mRecyclerView.setAdapter(mAdapter);
+        mAdapter.startListening();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mAdapter.stopListening();
+    }
+
+    private void checkIfExistPost() {
+        mPostProvider.getPostByUser(mExtraIdUser).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException error) {
+                int numberPost = queryDocumentSnapshots.size();
+                if(numberPost >0) {
+                    mTextViewPostExist.setText("Publicaciones:");
+                    mTextViewPostExist.setTextColor(Color.BLACK);
+                }
+                else {
+                    mTextViewPostExist.setText("No hay publicaciones.");
+                    mTextViewPostExist.setTextColor(Color.GRAY);
+                }
+            }
+        });
     }
 
     private void getPostNumber() {

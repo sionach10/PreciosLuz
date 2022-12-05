@@ -1,10 +1,8 @@
 package com.socialtravel.fragments;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,11 +10,22 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.socialtravel.R;
 import com.socialtravel.activities.EditProfileActivity;
+import com.socialtravel.adapters.MyPostAdapter;
+import com.socialtravel.models.Post;
 import com.socialtravel.providers.AuthProvider;
 import com.socialtravel.providers.PostProvider;
 import com.socialtravel.providers.UserProvider;
@@ -32,12 +41,16 @@ public class ProfileFragment extends Fragment {
     TextView mTextViewPhone;
     TextView mTextViewEmail;
     TextView mTextViewPostNumber;
+    TextView mTextViewPostExist;
     ImageView mImageViewCover;
     CircleImageView mCircleImageProfile;
+    RecyclerView mRecyclerView;
 
     UserProvider mUserProvider;
     AuthProvider mAuthProvider;
     PostProvider mPostProvider;
+
+    MyPostAdapter mAdapter;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -55,9 +68,13 @@ public class ProfileFragment extends Fragment {
         mTextViewUsername = mView.findViewById(R.id.textViewUsername);
         mTextViewPhone = mView.findViewById(R.id.textViewPhone);
         mTextViewPostNumber = mView.findViewById(R.id.textViewPostNumber);
+        mTextViewPostExist = mView.findViewById(R.id.textViewPostExist);
         mCircleImageProfile = mView.findViewById(R.id.circleImageProfile);
         mImageViewCover = mView.findViewById(R.id.imageViewCover);
+        mRecyclerView = mView.findViewById(R.id.recyclerViewMyPost);
 
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());//para que me ponga las tarjetas una debajo de otra.
+        mRecyclerView.setLayoutManager(linearLayoutManager);
 
 
         mLinearLayoutEditProfile.setOnClickListener(new View.OnClickListener() {
@@ -73,7 +90,43 @@ public class ProfileFragment extends Fragment {
 
         getUser();
         getPostNumber();
+        checkIfExistPost();
         return mView;
+    }
+
+    private void checkIfExistPost() {
+        mPostProvider.getPostByUser(mAuthProvider.getUid()).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException error) {
+                int numberPost = queryDocumentSnapshots.size();
+                if(numberPost >0) {
+                    mTextViewPostExist.setText("Publicaciones:");
+                    mTextViewPostExist.setTextColor(Color.BLACK);
+                }
+                else {
+                    mTextViewPostExist.setText("No hay publicaciones.");
+                    mTextViewPostExist.setTextColor(Color.GRAY);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Query query = mPostProvider.getPostByUser(mAuthProvider.getUid());//Devuelve todos los Post ordenador por timestamp.
+        FirestoreRecyclerOptions<Post> options = new FirestoreRecyclerOptions.Builder<Post>()
+                .setQuery(query, Post.class).build();
+
+        mAdapter = new MyPostAdapter(options, getContext());
+        mRecyclerView.setAdapter(mAdapter);
+        mAdapter.startListening();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mAdapter.stopListening();
     }
 
     private void goToEditProfile() {
