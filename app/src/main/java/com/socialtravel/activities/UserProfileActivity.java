@@ -1,12 +1,15 @@
 package com.socialtravel.activities;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -40,8 +43,8 @@ public class UserProfileActivity extends AppCompatActivity {
     TextView mTextViewPostExist;
     ImageView mImageViewCover;
     CircleImageView mCircleImageProfile;
-    CircleImageView mCircleImageViewBack;
     RecyclerView mRecyclerView;
+    Toolbar mToolbar;
 
     UserProvider mUserProvider;
     AuthProvider mAuthProvider;
@@ -64,8 +67,12 @@ public class UserProfileActivity extends AppCompatActivity {
         mTextViewPostExist = findViewById(R.id.textViewPostExist);
         mCircleImageProfile = findViewById(R.id.circleImageProfile);
         mImageViewCover = findViewById(R.id.imageViewCover);
-        mCircleImageViewBack = findViewById(R.id.circleImageBack);
         mRecyclerView = findViewById(R.id.recyclerViewMyPost);
+        mToolbar = findViewById(R.id.toolbar);
+
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle("");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(UserProfileActivity.this);//para que me ponga las tarjetas una debajo de otra.
         mRecyclerView.setLayoutManager(linearLayoutManager);
@@ -78,15 +85,6 @@ public class UserProfileActivity extends AppCompatActivity {
         MyPostAdapter mAdapter;
 
         mExtraIdUser = getIntent().getStringExtra("idUser");
-
-
-        mCircleImageViewBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
 
         getUser();
         getPostNumber();
@@ -171,5 +169,13 @@ public class UserProfileActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) { //Fix para corregir un crash del botón back del toolbar.
+        if(item.getItemId() == android.R.id.home) {
+            finish();
+        }
+        return true;
     }
 }
