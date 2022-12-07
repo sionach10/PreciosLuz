@@ -21,13 +21,16 @@
         android:theme="@style/Theme.SocialTravel"
         tools:targetApi="31">
         <activity
-            android:name=".activities.UserProfileActivity"
-            android:parentActivityName=".activities.PostDetailActivity"
+            android:name=".activities.FiltersActivity"
             android:exported="false" />
         <activity
+            android:name=".activities.UserProfileActivity"
+            android:exported="false"
+            android:parentActivityName=".activities.PostDetailActivity" />
+        <activity
             android:name=".activities.PostDetailActivity"
-            android:parentActivityName=".activities.HomeActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".activities.EditProfileActivity"
             android:exported="false" />

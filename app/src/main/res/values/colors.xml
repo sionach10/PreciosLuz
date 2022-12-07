@@ -12,6 +12,8 @@
     <color name="gris_claro">#DCDCDC</color>
     <color name="gris_oscuro">#606060</color>
     <color name="rojo">#BF0000</color>
+    <color name="azul">#006BDD</color>
+    <color name="verde">#0CB600</color>
 
 
 </resources>
