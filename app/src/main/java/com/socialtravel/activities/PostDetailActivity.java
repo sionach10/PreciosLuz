@@ -38,20 +38,29 @@ import com.socialtravel.R;
 import com.socialtravel.adapters.CommentAdapter;
 import com.socialtravel.adapters.SliderAdapter;
 import com.socialtravel.models.Comment;
+import com.socialtravel.models.FCMBody;
+import com.socialtravel.models.FCMResponse;
 import com.socialtravel.models.SliderItem;
 import com.socialtravel.providers.AuthProvider;
 import com.socialtravel.providers.CommentsProvider;
 import com.socialtravel.providers.LikesProvider;
+import com.socialtravel.providers.NotificationProvider;
 import com.socialtravel.providers.PostProvider;
+import com.socialtravel.providers.TokenProvider;
 import com.socialtravel.providers.UserProvider;
 import com.socialtravel.utils.RelativeTime;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class PostDetailActivity extends AppCompatActivity {
 
@@ -65,6 +74,8 @@ public class PostDetailActivity extends AppCompatActivity {
     AuthProvider mAuthProvider;
     CommentsProvider mCommentsProvider;
     LikesProvider mLikesProvider;
+    NotificationProvider mNotificationProvider;
+    TokenProvider mTokenProvider;
 
     String mExtraPostId;
     String mIdUser = "";
@@ -115,6 +126,9 @@ public class PostDetailActivity extends AppCompatActivity {
         mAuthProvider = new AuthProvider();
         mCommentsProvider = new CommentsProvider();
         mLikesProvider = new LikesProvider();
+        mNotificationProvider = new NotificationProvider();
+        mTokenProvider = new TokenProvider();
+
 
         mFabComment.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -218,7 +232,7 @@ public class PostDetailActivity extends AppCompatActivity {
         alert.show();
     }
 
-    private void createComment(String value) {
+    private void createComment(final String value) {
         Comment comment = new Comment();
         comment.setComment(value);
         comment.setIdPost(mExtraPostId);
@@ -228,11 +242,57 @@ public class PostDetailActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if(task.isSuccessful()) {
+                    sendNotification(value);
                     Toast.makeText(PostDetailActivity.this, "El comentario se creó correctamente.", Toast.LENGTH_SHORT).show();
                 }
                 else {
                     Toast.makeText(PostDetailActivity.this, "Error al guardar el comentario.", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+    }
+
+    private void sendNotification(String comment) {
+        if(mIdUser == null) {
+            return;
+        }
+        mTokenProvider.getToken(mIdUser).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if(documentSnapshot.exists()) {
+                    if(documentSnapshot.contains("token")){
+                        String token = documentSnapshot.getString("token");
+                        Map<String, String> data = new HashMap<>();
+                        data.put("title", "NUEVO COMENTARIO");
+                        data.put("body", comment);
+                        FCMBody body = new FCMBody(token, "high", "4500s", data);
+                        mNotificationProvider.sendNotification(body).enqueue(new Callback<FCMResponse>() {
+                            @Override
+                            public void onResponse(Call<FCMResponse> call, Response<FCMResponse> response) { //TODO: Tengo un 401 No autorizado al lanzar este método.
+                                if(response.body()!= null) {
+                                    if(response.body().getSuccess()== 1) {
+                                        Toast.makeText(PostDetailActivity.this, "Notificación enviada correctamente.", Toast.LENGTH_SHORT).show();
+                                    }
+                                    else {
+                                        Toast.makeText(PostDetailActivity.this, "La notificación no se pudo enviar.", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                                else {
+                                    Toast.makeText(PostDetailActivity.this, "La notificación no se pudo enviar."+ response.toString(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<FCMResponse> call, Throwable t) {
+                                Toast.makeText(PostDetailActivity.this, "Error: "+ t.toString(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }
+                else {
+                    Toast.makeText(PostDetailActivity.this, "El token no existe.", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
     }
