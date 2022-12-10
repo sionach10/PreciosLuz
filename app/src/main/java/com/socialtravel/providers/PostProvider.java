@@ -23,6 +23,13 @@ public class PostProvider {
     public Query getAll(){
         return mCollection.orderBy("timestamp", Query.Direction.DESCENDING);
     }
+    public Query getPostByTitle(String title){
+        return mCollection.orderBy("title").startAt(title).endAt(title+'\uf8ff');//Codigo para que sea como una SQL. El uf8ff es como el % en el like de SQL.
+    }
+
+    public Query getPostByCategoryAndTimestap(String category){
+        return mCollection.whereEqualTo("category", category).orderBy("timestamp", Query.Direction.DESCENDING);
+    }
 
     public Query getPostByUser(String id) {
         return mCollection.whereEqualTo("idUser", id); //Busca todos los post donde el idUser = id.
@@ -34,4 +41,6 @@ public class PostProvider {
     public Task<Void> delete(String id) {
         return mCollection.document(id).delete();
     }
+
+
 }

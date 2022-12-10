@@ -46,13 +46,13 @@ public class FiltersFragment extends Fragment {
         mCardViewXbox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToFilterActivity("Xbox");
+                goToFilterActivity("XBOX");
             }
         });
         mCardViewNintendo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToFilterActivity("Nintendo");
+                goToFilterActivity("NINTENDO");
             }
         });
         mCardViewPC.setOnClickListener(new View.OnClickListener() {

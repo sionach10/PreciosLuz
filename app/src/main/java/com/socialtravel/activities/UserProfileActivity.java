@@ -172,7 +172,7 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) { //Fix para corregir un crash del botón back del toolbar.
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) { //Fix para decir donde debe volver el botón atrás (para sobrescribir al Android Manifest).
         if(item.getItemId() == android.R.id.home) {
             finish();
         }

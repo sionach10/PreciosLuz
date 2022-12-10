@@ -40,6 +40,7 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import dmax.dialog.SpotsDialog;
@@ -230,7 +231,7 @@ public class PostActivity extends AppCompatActivity {
     }
 
     private void clickPost() {
-        mTitle = mTextInputTitle.getText().toString();
+        mTitle = mTextInputTitle.getText().toString().toUpperCase(Locale.ROOT);
         mdescription = mTextInputDescription.getText().toString();
 
         if(!mTitle.isEmpty() && !mdescription.isEmpty() && !mCategory.isEmpty()) {

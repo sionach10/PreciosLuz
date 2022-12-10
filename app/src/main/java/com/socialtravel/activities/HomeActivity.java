@@ -17,10 +17,14 @@ import com.socialtravel.fragments.ChatsFragment;
 import com.socialtravel.fragments.FiltersFragment;
 import com.socialtravel.fragments.HomeFragment;
 import com.socialtravel.fragments.ProfileFragment;
+import com.socialtravel.providers.AuthProvider;
+import com.socialtravel.providers.TokenProvider;
 
 public class HomeActivity extends AppCompatActivity {
 
     ActivityHomeBinding binding;
+    TokenProvider mTokenProvider;
+    AuthProvider mAuthProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +51,10 @@ public class HomeActivity extends AppCompatActivity {
             return true;
         });
 
+        mTokenProvider = new TokenProvider();
+        mAuthProvider = new AuthProvider();
         openFragment(new HomeFragment());
+        createToken();
     }
 
     public void openFragment(Fragment fragment) {
@@ -56,4 +63,10 @@ public class HomeActivity extends AppCompatActivity {
         transaction.addToBackStack(null);
         transaction.commit();
     }
+
+    private void createToken() {
+        mTokenProvider.create(mAuthProvider.getUid());
+    }
+
+
 }

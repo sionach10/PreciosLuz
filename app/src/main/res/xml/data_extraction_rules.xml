@@ -5,7 +5,8 @@
 -->
 <data-extraction-rules>
     <cloud-backup>
-        <!-- TODO: Use <include> and <exclude> to control what is backed up.
+        <!-- TODO: - Cerrar sesión da crash.
+                   - La búsqueda no funciona bien. PostProvider revisar query.
         <include .../>
         <exclude .../>
         -->
