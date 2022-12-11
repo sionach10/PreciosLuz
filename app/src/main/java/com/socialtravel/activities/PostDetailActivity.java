@@ -268,7 +268,7 @@ public class PostDetailActivity extends AppCompatActivity {
                         FCMBody body = new FCMBody(token, "high", "4500s", data);
                         mNotificationProvider.sendNotification(body).enqueue(new Callback<FCMResponse>() {
                             @Override
-                            public void onResponse(Call<FCMResponse> call, Response<FCMResponse> response) { //TODO: Tengo un 401 No autorizado al lanzar este método.
+                            public void onResponse(Call<FCMResponse> call, Response<FCMResponse> response) {
                                 if(response.body()!= null) {
                                     if(response.body().getSuccess()== 1) {
                                         Toast.makeText(PostDetailActivity.this, "Notificación enviada correctamente.", Toast.LENGTH_SHORT).show();
