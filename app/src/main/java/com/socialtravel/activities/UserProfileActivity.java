@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -25,6 +27,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.socialtravel.R;
 import com.socialtravel.adapters.MyPostAdapter;
 import com.socialtravel.models.Post;
+import com.socialtravel.models.User;
 import com.socialtravel.providers.AuthProvider;
 import com.socialtravel.providers.PostProvider;
 import com.socialtravel.providers.UserProvider;
@@ -45,6 +48,7 @@ public class UserProfileActivity extends AppCompatActivity {
     CircleImageView mCircleImageProfile;
     RecyclerView mRecyclerView;
     Toolbar mToolbar;
+    FloatingActionButton mFavChat;
 
     UserProvider mUserProvider;
     AuthProvider mAuthProvider;
@@ -69,6 +73,7 @@ public class UserProfileActivity extends AppCompatActivity {
         mImageViewCover = findViewById(R.id.imageViewCover);
         mRecyclerView = findViewById(R.id.recyclerViewMyPost);
         mToolbar = findViewById(R.id.toolbar);
+        mFavChat = findViewById(R.id.fabChat);
 
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("");
@@ -86,10 +91,29 @@ public class UserProfileActivity extends AppCompatActivity {
 
         mExtraIdUser = getIntent().getStringExtra("idUser");
 
+        //Ocultamos el botón de chat si está en su mismo perfil (para no hablar consigo mismo).
+        if(mAuthProvider.getUid().equals(mExtraIdUser)) {
+            mFavChat.setVisibility(View.GONE); //setEnable también serviría.
+        }
+
+        mFavChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToChatActivity();
+            }
+        });
+
         getUser();
         getPostNumber();
         checkIfExistPost();
 
+    }
+
+    private void goToChatActivity() {
+        Intent intent = new Intent(UserProfileActivity.this, ChatActivity.class);
+        intent.putExtra("idUser1", mAuthProvider.getUid());
+        intent.putExtra("idUser2", mExtraIdUser);
+        startActivity(intent);
     }
 
     @Override

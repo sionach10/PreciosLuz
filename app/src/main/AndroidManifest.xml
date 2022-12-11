@@ -21,9 +21,12 @@
         android:theme="@style/Theme.SocialTravel"
         tools:targetApi="31">
         <activity
+            android:name=".activities.ChatActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.FiltersActivity"
             android:exported="false"
-            android:parentActivityName=".activities.HomeActivity"/>
+            android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".activities.UserProfileActivity"
             android:exported="false"
@@ -55,7 +58,7 @@
         <activity
             android:name=".activities.HomeActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustNothing"/> <!--Para que al hacer clic en la busqueda y aparezca el teclado, no se descuadre el bottomNavigation-->
+            android:windowSoftInputMode="adjustNothing" /> <!-- Para que al hacer clic en la busqueda y aparezca el teclado, no se descuadre el bottomNavigation -->
         <activity
             android:name=".activities.RegisterActivity"
             android:exported="false" />
@@ -79,8 +82,7 @@
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="@string/default_notification_channel_id"/>
-
+            android:value="@string/default_notification_channel_id" />
     </application>
 
 </manifest>

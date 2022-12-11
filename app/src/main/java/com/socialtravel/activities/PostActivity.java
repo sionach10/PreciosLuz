@@ -286,7 +286,7 @@ public class PostActivity extends AppCompatActivity {
                                                 Post post = new Post();
                                                 post.setImage1(url);
                                                 post.setImage2(url2);
-                                                post.setTitle(mTitle);
+                                                post.setTitle(mTitle.toLowerCase(Locale.ROOT));
                                                 post.setDescription(mdescription);
                                                 post.setCategory(mCategory);
                                                 post.setIdUser(mAuthProvider.getUid());

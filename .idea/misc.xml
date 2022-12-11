@@ -15,6 +15,7 @@
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout-w1240dp/activity_login.xml" value="0.17302543507362783" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout-w936dp/activity_login.xml" value="0.201953125" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/action_bar_toolbar.xml" value="0.14605263157894738" />
+        <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/activity_chat.xml" value="0.30526315789473685" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/activity_complete_profile.xml" value="0.18" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/activity_edi_profile.xml" value="0.3087719298245614" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/activity_edit_profile.xml" value="0.33" />
@@ -26,6 +27,8 @@
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/activity_post_detail.xml" value="0.16" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/activity_register.xml" value="0.2" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/activity_user_profile.xml" value="0.22" />
+        <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/cardview_chat.xml" value="0.17894736842105263" />
+        <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/cardview_chats.xml" value="0.5" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/cardview_comment.xml" value="0.5" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/cardview_my_post.xml" value="0.25" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/cardview_post.xml" value="0.22" />
