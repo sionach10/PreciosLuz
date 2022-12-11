@@ -62,6 +62,7 @@ public class ChatsFragment extends Fragment {
 
     @Override
     public void onStop() {
+        super.onStop();
         mAdapter.stopListening();
     }
 }

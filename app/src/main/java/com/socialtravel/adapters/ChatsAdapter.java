@@ -1,6 +1,7 @@
 package com.socialtravel.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.socialtravel.R;
+import com.socialtravel.activities.ChatActivity;
 import com.socialtravel.models.Chat;
 import com.socialtravel.providers.AuthProvider;
 import com.socialtravel.providers.UserProvider;
@@ -48,7 +50,21 @@ public class ChatsAdapter extends FirestoreRecyclerAdapter <Chat, ChatsAdapter.V
         else {
             getUserInfo(chat.getIdUser1(), holder);
         }
-        getUserInfo(chatId, holder);
+        holder.viewHolder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToChatActivity(chatId, chat.getIdUser1(), chat.getIdUser2());
+            }
+        });
+    }
+
+    private void goToChatActivity(String chatId, String idUser1, String idUser2) {
+        Intent intent = new Intent(context, ChatActivity.class);
+        intent.putExtra("idChat", chatId);
+        intent.putExtra("idUser1", idUser1);
+        intent.putExtra("idUser2", idUser2);
+        context.startActivity(intent);
+
     }
 
     private void getUserInfo(String idUser, ViewHolder holder) {
