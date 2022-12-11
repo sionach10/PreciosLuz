@@ -15,6 +15,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.socialtravel.R;
 import com.socialtravel.models.Chat;
+import com.socialtravel.providers.AuthProvider;
 import com.socialtravel.providers.UserProvider;
 import com.squareup.picasso.Picasso;
 
@@ -27,10 +28,13 @@ public class ChatsAdapter extends FirestoreRecyclerAdapter <Chat, ChatsAdapter.V
 
     Context context;
     UserProvider mUserProvidier;
+    AuthProvider mAuthProvider;
+
     public ChatsAdapter(FirestoreRecyclerOptions<Chat> options, Context context) {
         super(options);
         this.context = context;
         mUserProvidier = new UserProvider();
+        mAuthProvider = new AuthProvider();
     }
 
     @Override
@@ -38,6 +42,12 @@ public class ChatsAdapter extends FirestoreRecyclerAdapter <Chat, ChatsAdapter.V
 
         DocumentSnapshot document = getSnapshots().getSnapshot(position);
         final String chatId = document.getId();
+        if(mAuthProvider.getUid().equals(chat.getIdUser1())) {
+            getUserInfo(chat.getIdUser2(), holder);
+        }
+        else {
+            getUserInfo(chat.getIdUser1(), holder);
+        }
         getUserInfo(chatId, holder);
     }
 

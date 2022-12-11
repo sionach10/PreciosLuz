@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/button_border.xml" value="0.2755" />
+        <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/custom_edittext_chat.xml" value="0.2735" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_arrow_left.xml" value="0.1535" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_baseline_email_24.xml" value="0.274" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_baseline_person_24_color.xml" value="0.1" />
@@ -32,6 +33,7 @@
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/cardview_comment.xml" value="0.5" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/cardview_my_post.xml" value="0.25" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/cardview_post.xml" value="0.22" />
+        <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/custom_chat_toolbar.xml" value="0.30526315789473685" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/fragment_chats.xml" value="0.1" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/fragment_filters.xml" value="0.2" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/fragment_home.xml" value="0.18" />
