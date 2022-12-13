@@ -1,10 +1,5 @@
 package com.socialtravel.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,12 +9,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.socialtravel.R;
+import com.socialtravel.adapters.MessagesAdapter;
 import com.socialtravel.models.Chat;
 import com.socialtravel.models.Message;
 import com.socialtravel.providers.AuthProvider;
@@ -51,8 +56,13 @@ public class ChatActivity extends AppCompatActivity {
     TextView mTextViewUsername;
     TextView mTextViewRelativeTime;
     ImageView mImageViewBack;
+    RecyclerView mReciclerViewMessage;
+
+    MessagesAdapter mAdapter;
 
     View mActionBarView;
+
+    LinearLayoutManager mLinearLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +76,11 @@ public class ChatActivity extends AppCompatActivity {
 
         mEditTextMessage = findViewById(R.id.editTextMessage);
         mImageViewSendMessage = findViewById(R.id.imageViewSendMessage);
+        mReciclerViewMessage = findViewById(R.id.recyclerViewMessage);
+
+        mLinearLayoutManager = new LinearLayoutManager(ChatActivity.this);
+        mLinearLayoutManager.setStackFromEnd(true);//Así entra en la pantalla apuntando a la parte de abajo (al último mensaje).
+        mReciclerViewMessage.setLayoutManager(mLinearLayoutManager);
 
         mExtraIdUser1 = getIntent().getStringExtra("idUser1");
         mExtraIdUser2 = getIntent().getStringExtra("idUser2");
@@ -81,6 +96,46 @@ public class ChatActivity extends AppCompatActivity {
         });
         checkIfChatExist();
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        /*
+        if(mExtraIdChat!= null) {
+            if(!mExtraIdChat.isEmpty()) {
+                getMessageChat();
+            }
+        }
+        */
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mAdapter.stopListening();
+    }
+
+    private void getMessageChat() {
+        Query query = mMessageProvider.getMessagesByChat(mExtraIdChat);//Devuelve todos los Post ordenador por timestamp.
+        FirestoreRecyclerOptions<Message> options = new FirestoreRecyclerOptions.Builder<Message>()
+                .setQuery(query, Message.class).build();
+
+        mAdapter = new MessagesAdapter(options, ChatActivity.this);
+        mReciclerViewMessage.setAdapter(mAdapter);
+        mAdapter.startListening();
+        mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {//Para que vaya bajando al final conforme lleguen mensajes al chat.
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                super.onItemRangeInserted(positionStart, itemCount);
+                int numberMessages = mAdapter.getItemCount();
+                int lastMessagePosition = mLinearLayoutManager.findLastVisibleItemPosition();
+
+                if(lastMessagePosition == -1 || (positionStart >= (numberMessages -1) && lastMessagePosition == (positionStart-1))) {
+                    mReciclerViewMessage.scrollToPosition(positionStart);
+                }
+            }
+        });
+    };
 
     private void sendMessage() {
         String textMessage = mEditTextMessage.getText().toString();
@@ -104,7 +159,7 @@ public class ChatActivity extends AppCompatActivity {
                 public void onComplete(@NonNull Task<Void> task) {
                     if(task.isSuccessful()) {
                         mEditTextMessage.setText("");
-                        Toast.makeText(ChatActivity.this, "El mensaje se creo correctamente", Toast.LENGTH_SHORT).show();
+                        mAdapter.notifyDataSetChanged();
                     }
                     else {
                         Toast.makeText(ChatActivity.this, "El mensaje no se pudo crear correctamente", Toast.LENGTH_SHORT).show();
@@ -181,6 +236,7 @@ public class ChatActivity extends AppCompatActivity {
                 }
                 else {
                     mExtraIdChat = queryDocumentSnapshots.getDocuments().get(0).getId();
+                    getMessageChat();
                 }
             }
         });

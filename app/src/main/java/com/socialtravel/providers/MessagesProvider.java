@@ -4,6 +4,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.socialtravel.models.Message;
 
 
@@ -19,5 +20,10 @@ public class MessagesProvider {
         DocumentReference document = mCollection.document();
         message.setId(document.getId());
         return document.set(message);
+    }
+
+    //Devolver todos los mensajes que pertenecen a un chat.
+    public Query getMessagesByChat(String idChat) {
+        return mCollection.whereEqualTo("idChat", idChat).orderBy("timestamp", Query.Direction.ASCENDING);
     }
 }
