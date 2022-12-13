@@ -19,6 +19,7 @@ import com.socialtravel.adapters.PostsAdapter;
 import com.socialtravel.models.Post;
 import com.socialtravel.providers.AuthProvider;
 import com.socialtravel.providers.PostProvider;
+import com.socialtravel.utils.ViewedMessageHelper;
 
 public class FiltersActivity extends AppCompatActivity {
 
@@ -64,6 +65,13 @@ public class FiltersActivity extends AppCompatActivity {
         mPostAdapter = new PostsAdapter(options, FiltersActivity.this, mTextViewNumberFilter);
         mRecyclerView.setAdapter(mPostAdapter);
         mPostAdapter.startListening();
+        ViewedMessageHelper.updateOnline(true, FiltersActivity.this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        ViewedMessageHelper.updateOnline(false, FiltersActivity.this);
     }
 
     @Override

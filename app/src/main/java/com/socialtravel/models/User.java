@@ -10,6 +10,9 @@ public class User {
     private String imageProfile; //Es string porque es la URL de la imagen.
     private String imageCover;
     private long timestamp;
+    private long lastConnection;
+    boolean online;
+
     //private String password; //Para guardar la contraseña (estaría feo).
 
     //Constructor
@@ -17,7 +20,7 @@ public class User {
 
     }
 
-    public User(String id, String email, String username, String phone, String imageProfile, String imageCover, long timestamp) {
+    public User(String id, String email, String username, String phone, String imageProfile, String imageCover, long timestamp, long lastConnection, boolean online) {
         this.id = id;
         this.email = email;
         this.username = username;
@@ -25,6 +28,8 @@ public class User {
         this.imageProfile = imageProfile;
         this.imageCover = imageCover;
         this.timestamp = timestamp;
+        this.lastConnection = lastConnection;
+        this.online = online;
     }
 
     //Metodos Getter and Setter:
@@ -82,5 +87,21 @@ public class User {
 
     public void setImageCover(String imageCover) {
         this.imageCover = imageCover;
+    }
+
+    public long getLastConnection() {
+        return lastConnection;
+    }
+
+    public void setLastConnection(long lastConnection) {
+        this.lastConnection = lastConnection;
+    }
+
+    public boolean isOnline() {
+        return online;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
     }
 }

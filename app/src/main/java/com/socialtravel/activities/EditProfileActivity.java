@@ -34,6 +34,7 @@ import com.socialtravel.providers.AuthProvider;
 import com.socialtravel.providers.ImageProvider;
 import com.socialtravel.providers.UserProvider;
 import com.socialtravel.utils.FileUtil;
+import com.socialtravel.utils.ViewedMessageHelper;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -437,4 +438,17 @@ public class EditProfileActivity extends AppCompatActivity {
                         }
                     }
             );
+
+    @Override
+    protected void onStart() { //Metodos del ciclo de vida de la app.
+        super.onStart();
+        ViewedMessageHelper.updateOnline(true, EditProfileActivity.this);//Controlador de si el usuario está online o no.
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        ViewedMessageHelper.updateOnline(false, EditProfileActivity.this);
+    }
+
 }

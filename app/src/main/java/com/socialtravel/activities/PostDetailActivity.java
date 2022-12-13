@@ -29,6 +29,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
@@ -49,6 +50,7 @@ import com.socialtravel.providers.PostProvider;
 import com.socialtravel.providers.TokenProvider;
 import com.socialtravel.providers.UserProvider;
 import com.socialtravel.utils.RelativeTime;
+import com.socialtravel.utils.ViewedMessageHelper;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -92,6 +94,8 @@ public class PostDetailActivity extends AppCompatActivity {
     FloatingActionButton mFabComment;
     RecyclerView mRecyclerView;
     Toolbar mToolbar;
+
+    ListenerRegistration mListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,17 +152,21 @@ public class PostDetailActivity extends AppCompatActivity {
     }
 
     private void getNumberLikes() {
-        mLikesProvider.getLikesByPost(mExtraPostId).addSnapshotListener(new EventListener<QuerySnapshot>() {
+        mListener = mLikesProvider.getLikesByPost(mExtraPostId).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                 mLikesProvider.getLikesByPost(mExtraPostId).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        int numberLikes = queryDocumentSnapshots.size();
-                        if(numberLikes ==1)
-                            mTextViewLikes.setText(numberLikes + " like");
-                        else
-                            mTextViewLikes.setText(numberLikes + " likes");
+                        if(queryDocumentSnapshots!= null) {
+                            int numberLikes = queryDocumentSnapshots.size();
+                            if(numberLikes ==1) {
+                                mTextViewLikes.setText(numberLikes + " like");
+                            }
+                            else {
+                                mTextViewLikes.setText(numberLikes + " likes");
+                            }
+                        }
                     }
                 });
             }
@@ -176,12 +184,27 @@ public class PostDetailActivity extends AppCompatActivity {
         mCommentsAdapter = new CommentAdapter(options, PostDetailActivity.this);
         mRecyclerView.setAdapter(mCommentsAdapter);
         mCommentsAdapter.startListening();
+        ViewedMessageHelper.updateOnline(true, PostDetailActivity.this);//Controlador de si el usuario está online o no.
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        ViewedMessageHelper.updateOnline(false, PostDetailActivity.this);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         mCommentsAdapter.stopListening();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(mListener!= null) {
+            mListener.remove();
+        }
     }
 
     private void showDialogComment() {

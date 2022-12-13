@@ -19,6 +19,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.socialtravel.R;
 import com.socialtravel.activities.PostDetailActivity;
@@ -40,6 +41,7 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
     LikesProvider mLikesProvider;
     AuthProvider mAuthProvider;
     TextView mTextViewNumberFilter;
+    ListenerRegistration mListener;
 
 
     public PostsAdapter(FirestoreRecyclerOptions<Post> options, Context context) {
@@ -104,15 +106,17 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
     }
 
     private void getNumberLikesByPost(String idPost, ViewHolder holder) {
-        mLikesProvider.getLikesByPost(idPost).addSnapshotListener(new EventListener<QuerySnapshot>() {
+        mListener = mLikesProvider.getLikesByPost(idPost).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                int numberLikes = value.size();//TODO: al cerrar sesión tengo un puntero nulo.
-                holder.textViewLikes.setText(String.valueOf((numberLikes)) + " likes.");
+                if(value != null) {
+                    int numberLikes = value.size();
+                    holder.textViewLikes.setText(String.valueOf((numberLikes)) + " likes.");
+                }
+
             }
         });
     }
-
 
     private void like(final Like like, ViewHolder holder) {
         mLikesProvider.getLikeByPostAndUser(like.getIdPost(), mAuthProvider.getUid()).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -163,6 +167,11 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
                 }
             }
         });
+    }
+
+    //Ojo en un adapter no existe el método del ciclo de vida de destroy. Para destruir el mListener debemos crear un método.
+    public ListenerRegistration getListener() {
+        return mListener;
     }
 
     @NonNull

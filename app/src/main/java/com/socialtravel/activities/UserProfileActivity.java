@@ -22,6 +22,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.socialtravel.R;
@@ -31,6 +32,7 @@ import com.socialtravel.models.User;
 import com.socialtravel.providers.AuthProvider;
 import com.socialtravel.providers.PostProvider;
 import com.socialtravel.providers.UserProvider;
+import com.socialtravel.utils.ViewedMessageHelper;
 import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -55,6 +57,8 @@ public class UserProfileActivity extends AppCompatActivity {
     PostProvider mPostProvider;
 
     MyPostAdapter mAdapter;
+
+    ListenerRegistration mListener;
 
 
 
@@ -126,6 +130,14 @@ public class UserProfileActivity extends AppCompatActivity {
         mAdapter = new MyPostAdapter(options, UserProfileActivity.this);
         mRecyclerView.setAdapter(mAdapter);
         mAdapter.startListening();
+        ViewedMessageHelper.updateOnline(true, UserProfileActivity.this);//Controlador de si el usuario está online o no.
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        ViewedMessageHelper.updateOnline(false, UserProfileActivity.this);
     }
 
     @Override
@@ -134,18 +146,28 @@ public class UserProfileActivity extends AppCompatActivity {
         mAdapter.stopListening();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(mListener!= null) {
+            mListener.remove();
+        }
+    }
+
     private void checkIfExistPost() {
-        mPostProvider.getPostByUser(mExtraIdUser).addSnapshotListener(new EventListener<QuerySnapshot>() {
+        mListener = mPostProvider.getPostByUser(mExtraIdUser).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException error) {
-                int numberPost = queryDocumentSnapshots.size();
-                if(numberPost >0) {
-                    mTextViewPostExist.setText("Publicaciones:");
-                    mTextViewPostExist.setTextColor(Color.BLACK);
-                }
-                else {
-                    mTextViewPostExist.setText("No hay publicaciones.");
-                    mTextViewPostExist.setTextColor(Color.GRAY);
+                if(queryDocumentSnapshots!= null) {
+                    int numberPost = queryDocumentSnapshots.size();
+                    if(numberPost >0) {
+                        mTextViewPostExist.setText("Publicaciones:");
+                        mTextViewPostExist.setTextColor(Color.BLACK);
+                    }
+                    else {
+                        mTextViewPostExist.setText("No hay publicaciones.");
+                        mTextViewPostExist.setTextColor(Color.GRAY);
+                    }
                 }
             }
         });

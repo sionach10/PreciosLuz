@@ -51,7 +51,7 @@ public class MessagesAdapter extends FirestoreRecyclerAdapter <Message, Messages
         DocumentSnapshot document = getSnapshots().getSnapshot(position);
         final String messageId = document.getId();
         holder.textViewMessage.setText(message.getMessage());
-        String relativeTime = RelativeTime.getTimeAgo(message.getTimestamp(), context);
+        String relativeTime = RelativeTime.timeFormatAMPM(message.getTimestamp(), context);
         holder.textViewDate.setText(relativeTime);
 
         if(message.getIdSender().equals(mAuthProvider.getUid())) { //Parametros de los mensajes del emisor.
@@ -62,7 +62,7 @@ public class MessagesAdapter extends FirestoreRecyclerAdapter <Message, Messages
             params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
             params.setMargins(150,0,0,0);
             holder.linearLayoutMessage.setLayoutParams(params);
-            holder.linearLayoutMessage.setPadding(30,20,25,20);
+            holder.linearLayoutMessage.setPadding(30,20,0,20);
             holder.linearLayoutMessage.setBackground(context.getResources().getDrawable(R.drawable.rounded_linear_layout));
             holder.imageViewViewed.setVisibility(View.VISIBLE);
             holder.textViewMessage.setTextColor(Color.WHITE);
@@ -81,6 +81,13 @@ public class MessagesAdapter extends FirestoreRecyclerAdapter <Message, Messages
             holder.imageViewViewed.setVisibility(View.GONE);
             holder.textViewMessage.setTextColor(Color.DKGRAY);
             holder.textViewDate.setTextColor(Color.LTGRAY);
+        }
+
+        if(message.isViewed()) {
+            holder.imageViewViewed.setImageResource(R.drawable.ic_double_check_blue);
+        }
+        else {
+            holder.imageViewViewed.setImageResource(R.drawable.ic_double_check_gris);
         }
     }
 

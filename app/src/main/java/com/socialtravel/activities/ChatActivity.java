@@ -10,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -20,7 +21,11 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.socialtravel.R;
@@ -31,6 +36,8 @@ import com.socialtravel.providers.AuthProvider;
 import com.socialtravel.providers.ChatsProvider;
 import com.socialtravel.providers.MessagesProvider;
 import com.socialtravel.providers.UserProvider;
+import com.socialtravel.utils.RelativeTime;
+import com.socialtravel.utils.ViewedMessageHelper;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -64,6 +71,8 @@ public class ChatActivity extends AppCompatActivity {
 
     LinearLayoutManager mLinearLayoutManager;
 
+    ListenerRegistration mLisener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,7 +95,7 @@ public class ChatActivity extends AppCompatActivity {
         mExtraIdUser2 = getIntent().getStringExtra("idUser2");
         mExtraIdChat = getIntent().getStringExtra("idChat");
 
-        showCustomToolbar(R.layout.custom_chat_toolbar);
+        showCustomToolbar(R.layout.custom_chat_toolbar);//Aquí manejamos el toolbar del usuario, imagen de perfil y última conexión.
 
         mImageViewSendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,19 +109,30 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        /*
-        if(mExtraIdChat!= null) {
-            if(!mExtraIdChat.isEmpty()) {
-                getMessageChat();
-            }
+        if(mAdapter!=null) {
+            mAdapter.startListening();//Esto sirve para que si me salgo de la app y vuelvo a entrar, para que al volver no me encuentre el chat vacío.
         }
-        */
+        ViewedMessageHelper.updateOnline(true, ChatActivity.this);//Controlador de si el usuario está online o no.
     }
 
     @Override
     public void onStop() {
         super.onStop();
         mAdapter.stopListening();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(mLisener != null) {
+            mLisener.remove();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        ViewedMessageHelper.updateOnline(false, ChatActivity.this);//Controlador de si el usuario está online o no.
     }
 
     private void getMessageChat() {
@@ -123,10 +143,11 @@ public class ChatActivity extends AppCompatActivity {
         mAdapter = new MessagesAdapter(options, ChatActivity.this);
         mReciclerViewMessage.setAdapter(mAdapter);
         mAdapter.startListening();
-        mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {//Para que vaya bajando al final conforme lleguen mensajes al chat.
+        mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {//Para que vaya bajando al final conforme lleguen mensajes al chat. Función que detecta cambios en BBDD
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
                 super.onItemRangeInserted(positionStart, itemCount);
+                updateViewed();
                 int numberMessages = mAdapter.getItemCount();
                 int lastMessagePosition = mLinearLayoutManager.findLastVisibleItemPosition();
 
@@ -203,22 +224,32 @@ public class ChatActivity extends AppCompatActivity {
         else {
             idUserInfo = mExtraIdUser1;
         }
-        mUserProvider.getUser(idUserInfo).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+
+        mLisener = mUserProvider.getUserRealTime(idUserInfo).addSnapshotListener(new EventListener<DocumentSnapshot>() {//Esto hay que hacerlo en todos los snapshotListener. Destruirlo en el destroy. Debemos detener la escucha una vez que se cierra el activity, si no dará crash.
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if(documentSnapshot.exists()) {
-                    if(documentSnapshot.contains("username")) {
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
+                if (documentSnapshot.exists()) {
+                    if (documentSnapshot.contains("username")) {
                         String username = documentSnapshot.getString("username");
                         mTextViewUsername.setText(username);
                     }
-                    if(documentSnapshot.contains("image_profile")) {
+                    if (documentSnapshot.contains("image_profile")) {
                         String imageProfile = documentSnapshot.getString("image_profile");
-                        if(imageProfile!= null) {
-                            if(!imageProfile.equals("")){
+                        if (imageProfile != null) {
+                            if (!imageProfile.equals("")) {
                                 Picasso.with(ChatActivity.this).load(imageProfile).into(mCircleImageViewProfile);
                             }
                         }
-
+                    }
+                    if (documentSnapshot.contains("online")) {
+                        boolean online = documentSnapshot.getBoolean("online");
+                        if (online) {
+                            mTextViewRelativeTime.setText("En línea");
+                        } else if (documentSnapshot.contains("lastConnect")) {
+                            long lastConnect = documentSnapshot.getLong("lastConnect");
+                            String relativeTime = RelativeTime.getTimeAgo(lastConnect, ChatActivity.this);
+                            mTextViewRelativeTime.setText(relativeTime);
+                        }
                     }
                 }
             }
@@ -237,6 +268,25 @@ public class ChatActivity extends AppCompatActivity {
                 else {
                     mExtraIdChat = queryDocumentSnapshots.getDocuments().get(0).getId();
                     getMessageChat();
+                    updateViewed();
+                }
+            }
+        });
+    }
+
+    private void updateViewed() {
+        String idSender = "";
+        if(mAuthProvider.getUid().equals(mExtraIdUser1)) {
+            idSender = mExtraIdUser2;
+        }
+        else {
+            idSender = mExtraIdUser1;
+        }
+        mMessageProvider.getMessagesByChatAndSender(mExtraIdChat, idSender).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
+                    mMessageProvider.updateViewed(document.getId(), true);
                 }
             }
         });
@@ -255,6 +305,7 @@ public class ChatActivity extends AppCompatActivity {
         ids.add(mExtraIdUser2);
         chat.setIds(ids);
         mChatsProvider.create(chat);
-
+        mExtraIdChat = chat.getId();
+        getMessageChat();
     }
 }

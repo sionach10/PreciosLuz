@@ -19,12 +19,15 @@ import com.socialtravel.fragments.HomeFragment;
 import com.socialtravel.fragments.ProfileFragment;
 import com.socialtravel.providers.AuthProvider;
 import com.socialtravel.providers.TokenProvider;
+import com.socialtravel.providers.UserProvider;
+import com.socialtravel.utils.ViewedMessageHelper;
 
 public class HomeActivity extends AppCompatActivity {
 
     ActivityHomeBinding binding;
     TokenProvider mTokenProvider;
     AuthProvider mAuthProvider;
+    UserProvider mUserProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +56,22 @@ public class HomeActivity extends AppCompatActivity {
 
         mTokenProvider = new TokenProvider();
         mAuthProvider = new AuthProvider();
+        mUserProvider = new UserProvider();
+
         openFragment(new HomeFragment());
         createToken();
+    }
+
+    @Override
+    protected void onStart() { //Metodos del ciclo de vida de la app.
+        super.onStart();
+        ViewedMessageHelper.updateOnline(true, HomeActivity.this);//Controlador de si el usuario está online o no.
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        ViewedMessageHelper.updateOnline(false, HomeActivity.this);
     }
 
     public void openFragment(Fragment fragment) {
