@@ -62,6 +62,10 @@ public class ChatActivity extends AppCompatActivity {
     String mExtraIdUser1;
     String mExtraIdUser2;
     String mExtraIdChat;
+    String mMyUsername;
+    String mUsernameChat;
+    String mImageSender;
+    String mImageReceiver;
 
     long mIdNotificationChat;
 
@@ -74,7 +78,6 @@ public class ChatActivity extends AppCompatActivity {
 
     EditText mEditTextMessage;
     ImageView mImageViewSendMessage;
-
     CircleImageView mCircleImageViewProfile;//Ojo estos objetos no se pueden inicializar en el onCreate con findViewById porque estan dentro del toolbar. Lo haremos en el showCustomToolbar.
     TextView mTextViewUsername;
     TextView mTextViewRelativeTime;
@@ -88,9 +91,6 @@ public class ChatActivity extends AppCompatActivity {
     LinearLayoutManager mLinearLayoutManager;
 
     ListenerRegistration mListener;
-
-    String mMyUsername;
-    String mUsernameChat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,7 +183,7 @@ public class ChatActivity extends AppCompatActivity {
     private void sendMessage() {
         String textMessage = mEditTextMessage.getText().toString();
         if(!textMessage.isEmpty()) {
-            Message message = new Message();
+            final Message message = new Message();
             message.setIdChat(mExtraIdChat);
             if(mAuthProvider.getUid().equals(mExtraIdUser1)) {
                 message.setIdSender(mExtraIdUser1);
@@ -257,10 +257,10 @@ public class ChatActivity extends AppCompatActivity {
                         mTextViewUsername.setText(mUsernameChat);
                     }
                     if (documentSnapshot.contains("image_profile")) {
-                        String imageProfile = documentSnapshot.getString("image_profile");
-                        if (imageProfile != null) {
-                            if (!imageProfile.equals("")) {
-                                Picasso.with(ChatActivity.this).load(imageProfile).into(mCircleImageViewProfile);
+                        mImageReceiver = documentSnapshot.getString("image_profile");
+                        if (mImageReceiver != null) {
+                            if (!mImageReceiver.equals("")) {
+                                Picasso.with(ChatActivity.this).load(mImageReceiver).into(mCircleImageViewProfile);
                             }
                         }
                     }
@@ -400,6 +400,11 @@ public class ChatActivity extends AppCompatActivity {
         data.put("messages", messages);
         data.put("usernameSender", mMyUsername.toUpperCase(Locale.ROOT));
         data.put("usernameReceiver", mUsernameChat.toUpperCase(Locale.ROOT));
+        data.put("imageSender", mImageSender);
+        data.put("imageReceiver", mImageReceiver);
+        data.put("idSender", message.getIdSender());
+        data.put("idReceiver", message.getIdReceiver());
+        data.put("idChat", message.getIdChat());
 
         String idSender = "";
         if(mAuthProvider.getUid().equals(mExtraIdUser1)) {
@@ -450,6 +455,9 @@ public class ChatActivity extends AppCompatActivity {
                 if(documentSnapshot.exists()) {
                     if(documentSnapshot.contains("username")) {
                         mMyUsername = documentSnapshot.getString("username");
+                    }
+                    if(documentSnapshot.contains("image_profile")) {
+                        mImageSender = documentSnapshot.getString("image_profile");
                     }
                 }
             }
