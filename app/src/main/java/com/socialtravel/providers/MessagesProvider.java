@@ -35,6 +35,29 @@ public class MessagesProvider {
         return mCollection.whereEqualTo("idChat", idChat).whereEqualTo("idSender", idSender).whereEqualTo("viewed", false);
     }
 
+    //Busca los mensajes sin el check de visto. Como esta query es compleja (varios whereEqualTo) hay que crear un indice en Firebase.
+    public Query getLastThreeMessagesByChatAndSender(String idChat, String idSender) {
+        return mCollection
+                .whereEqualTo("idChat", idChat)
+                .whereEqualTo("idSender", idSender)
+                .whereEqualTo("viewed", false)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(3);
+    }
+
+
+    public Query getLastMessage(String idChat) {
+        return mCollection.whereEqualTo("idChat", idChat).orderBy("timestamp", Query.Direction.DESCENDING).limit(1);
+    }
+
+    public Query getLastMessageSender(String idChat, String idSender) {
+        return mCollection
+                .whereEqualTo("idChat", idChat)
+                .whereEqualTo("idSender", idSender)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(1);
+    }
+
     public Task<Void> updateViewed (String idDocument, boolean state) {
         Map<String, Object> map = new HashMap<>();
         map.put("viewed", state);

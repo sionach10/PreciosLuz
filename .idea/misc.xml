@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/button_border.xml" value="0.2755" />
+        <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/circular_view.xml" value="0.2455" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/custom_edittext_chat.xml" value="0.2735" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_arrow_left.xml" value="0.1535" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_baseline_email_24.xml" value="0.274" />
@@ -31,7 +32,7 @@
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/activity_register.xml" value="0.2" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/activity_user_profile.xml" value="0.22" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/cardview_chat.xml" value="0.17894736842105263" />
-        <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/cardview_chats.xml" value="0.5" />
+        <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/cardview_chats.xml" value="0.18" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/cardview_comment.xml" value="0.5" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/cardview_message.xml" value="0.3043859649122807" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/cardview_my_post.xml" value="0.25" />
