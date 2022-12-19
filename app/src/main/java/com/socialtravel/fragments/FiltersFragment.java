@@ -3,6 +3,8 @@ package com.socialtravel.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
@@ -21,6 +23,7 @@ public class FiltersFragment extends Fragment {
     CardView mCardViewNintendo;
     CardView mCardViewPC;
 
+    Toolbar mToolbar;
 
     public FiltersFragment() {
         // Required empty public constructor
@@ -36,6 +39,10 @@ public class FiltersFragment extends Fragment {
         mCardViewXbox = mView.findViewById(R.id.cardViewXbox);
         mCardViewNintendo = mView.findViewById(R.id.cardViewNintendo);
         mCardViewPC = mView.findViewById(R.id.cardViewPC);
+        mToolbar = mView.findViewById(R.id.toolbar);
+
+        ((AppCompatActivity) getActivity()).setSupportActionBar(mToolbar);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Filtros");
 
         mCardViewPS4.setOnClickListener(new View.OnClickListener() {
             @Override

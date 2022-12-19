@@ -64,8 +64,8 @@ public class ChatActivity extends AppCompatActivity {
     String mExtraIdChat;
     String mMyUsername;
     String mUsernameChat;
-    String mImageSender;
-    String mImageReceiver;
+    String mImageSender="";
+    String mImageReceiver="";
 
     long mIdNotificationChat;
 
@@ -400,11 +400,19 @@ public class ChatActivity extends AppCompatActivity {
         data.put("messages", messages);
         data.put("usernameSender", mMyUsername.toUpperCase(Locale.ROOT));
         data.put("usernameReceiver", mUsernameChat.toUpperCase(Locale.ROOT));
-        data.put("imageSender", mImageSender);
-        data.put("imageReceiver", mImageReceiver);
         data.put("idSender", message.getIdSender());
         data.put("idReceiver", message.getIdReceiver());
         data.put("idChat", message.getIdChat());
+
+        data.put("imageSender", mImageSender);
+        data.put("imageReceiver", mImageReceiver);
+
+        if(mImageSender.equals("")) {
+            mImageSender = "IMAGEN_NO_VALIDA"; //Lo hacemos para que no esté vacía la variable.
+        }
+        if(mImageReceiver.equals("")) {
+            mImageReceiver = "IMAGEN_NO_VALIDA";
+        }
 
         String idSender = "";
         if(mAuthProvider.getUid().equals(mExtraIdUser1)) {

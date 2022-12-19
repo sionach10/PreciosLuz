@@ -70,15 +70,34 @@ public class NotificationHelper extends ContextWrapper {
                                                                 Bitmap bitmapReceiver,
                                                                 NotificationCompat.Action action) {
 
-        Person person1 = new Person.Builder()
-                .setName(usernameReceiver)
-                .setIcon(IconCompat.createWithBitmap(bitmapReceiver))
-                .build();
+        Person person1 = null;
+        Person person2 = null;
 
-        Person person2 = new Person.Builder()
-                .setName(usernameSender)
-                .setIcon(IconCompat.createWithBitmap(bitmapSender))
-                .build();
+        if(bitmapReceiver == null) { //Si es nulo, imagen por defecto, si tiene datos, cargamos los datos de la imagen.
+            person1 = new Person.Builder()
+                    .setName(usernameReceiver)
+                    .setIcon(IconCompat.createWithResource(getApplicationContext(), R.drawable.ic_person))
+                    .build();
+        }
+        else {
+            person1 = new Person.Builder()
+                    .setName(usernameReceiver)
+                    .setIcon(IconCompat.createWithBitmap(bitmapReceiver))
+                    .build();
+        }
+
+        if(bitmapSender == null) {
+            person2 = new Person.Builder()
+                    .setName(usernameSender)
+                    .setIcon(IconCompat.createWithResource(getApplicationContext(), R.drawable.ic_person))
+                    .build();
+        }
+        else {
+            person2 = new Person.Builder()
+                    .setName(usernameSender)
+                    .setIcon(IconCompat.createWithBitmap(bitmapSender))
+                    .build();
+        }
 
         NotificationCompat.MessagingStyle messagingStyle = new NotificationCompat.MessagingStyle(person1);
         NotificationCompat.MessagingStyle.Message message1 = new NotificationCompat.MessagingStyle.Message(lastMessage, new Date().getTime(), person1);

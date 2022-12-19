@@ -61,14 +61,72 @@ public class MyFirebaseMessagingClient extends FirebaseMessagingService {
     }
 
     private void showNotificationMessage(Map<String, String> data) {
-        String tittle = data.get("tittle");
-        String body = data.get("body");
+
+        final String imageSender = data.get("imageSender");
+        final String imageReceiver = data.get("imageReceiver");
+        
+        getImageSender(data, imageSender, imageReceiver);
+
+
+
+    }
+
+    private void getImageSender(final Map<String, String> data, final String imageSender, final String imageReceiver) {
+        new Handler(Looper.getMainLooper()) //Cargar la imagen del usuario en la notificación.
+                .post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Picasso.with(getApplicationContext())
+                                .load(imageSender)
+                                .into(new Target() {
+                                    @Override
+                                    public void onBitmapLoaded(Bitmap bitmapSender, Picasso.LoadedFrom from) {//Si no hay imagen no entra en este método.
+                                        getImageReceiver(data, imageReceiver, bitmapSender);
+                                    }
+
+                                    @Override
+                                    public void onBitmapFailed(Drawable errorDrawable) {
+                                        getImageReceiver(data, imageReceiver, null);
+                                    }
+
+                                    @Override
+                                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                                    }
+                                });
+                    }
+                });
+    }
+
+    private void getImageReceiver(final Map<String, String> data, final String imageReceiver, Bitmap bitmapSender) {
+        Picasso.with(getApplicationContext())
+                .load(imageReceiver)
+                .into(new Target() {
+                    @Override
+                    public void onBitmapLoaded(Bitmap bitmapReceiver, Picasso.LoadedFrom from) {
+                        notifyMessage(data, bitmapSender, bitmapReceiver);
+                    }
+
+                    @Override
+                    public void onBitmapFailed(Drawable errorDrawable) { //Entra aquí si no hay imagen.
+                        notifyMessage(data, bitmapSender, null);
+                    }
+
+                    @Override
+                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                    }
+                });
+    }
+
+    private void notifyMessage(Map<String, String> data, Bitmap bitmapSender, Bitmap bitmapReceiver) {
         final String usernameSender = data.get("usernameSender");
         final String usernameReceiver = data.get("usernameReceiver");
         final String lastMessage = data.get("lastMessage");
         String messagesJSON = data.get("messages");
         final String imageSender = data.get("imageSender");
         final String imageReceiver = data.get("imageReceiver");
+
         final String idSender = data.get("idSender");
         final String idReceiver = data.get("idReceiver");
         final String idChat = data.get("idChat");
@@ -79,6 +137,12 @@ public class MyFirebaseMessagingClient extends FirebaseMessagingService {
         intent.putExtra("idReceiver", idReceiver);
         intent.putExtra("idChat", idChat);
         intent.putExtra("idNotification", idNotification);
+        intent.putExtra("usernameSender", usernameSender);
+        intent.putExtra("usernameReceiver", usernameReceiver);
+        intent.putExtra("imageSender", imageSender);
+        intent.putExtra("imageReceiver", imageReceiver);
+
+
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -93,57 +157,15 @@ public class MyFirebaseMessagingClient extends FirebaseMessagingService {
 
         Gson gson = new Gson();
         Message[] messages = gson.fromJson(messagesJSON, Message[].class);
-
-        new Handler(Looper.getMainLooper()) //Cargar la imagen del usuario en la notificación.
-                .post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Picasso.with(getApplicationContext())
-                                .load(imageSender)
-                                .into(new Target() {
-                                    @Override
-                                    public void onBitmapLoaded(Bitmap bitmapSender, Picasso.LoadedFrom from) {
-                                        Picasso.with(getApplicationContext())
-                                                .load(imageReceiver)
-                                                .into(new Target() {
-                                                    @Override
-                                                    public void onBitmapLoaded(Bitmap bitmapReceiver, Picasso.LoadedFrom from) {
-                                                        NotificationHelper notificationHelper = new NotificationHelper(getBaseContext());
-                                                        NotificationCompat.Builder builder = notificationHelper.getNotificationMessages(
-                                                                messages,
-                                                                usernameSender,
-                                                                usernameReceiver,
-                                                                lastMessage,
-                                                                bitmapSender,
-                                                                bitmapReceiver,
-                                                                action);
-                                                        notificationHelper.getManager().notify(idNotification, builder.build());//Con el id: 1 solo se manda una notificación y cuando se mande una nueva, como todas tienen id:1 se sustituye por el último mensaje enviado.
-                                                    }
-
-                                                    @Override
-                                                    public void onBitmapFailed(Drawable errorDrawable) {
-
-                                                    }
-
-                                                    @Override
-                                                    public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                                                    }
-                                                });
-                                    }
-
-                                    @Override
-                                    public void onBitmapFailed(Drawable errorDrawable) {
-
-                                    }
-
-                                    @Override
-                                    public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                                    }
-                                });
-                    }
-                });
-
+        NotificationHelper notificationHelper = new NotificationHelper(getBaseContext());
+        NotificationCompat.Builder builder = notificationHelper.getNotificationMessages(
+                messages,
+                usernameSender,
+                usernameReceiver,
+                lastMessage,
+                bitmapSender,
+                bitmapReceiver,
+                action);
+        notificationHelper.getManager().notify(idNotification, builder.build());//Con el id: 1 solo se manda una notificación y cuando se mande una nueva, como todas tienen id:1 se sustituye por el último mensaje enviado.
     }
 }
