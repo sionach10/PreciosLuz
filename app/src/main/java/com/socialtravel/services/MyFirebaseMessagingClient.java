@@ -10,6 +10,7 @@ import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.RemoteInput;
+import androidx.core.graphics.drawable.IconCompat;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -62,16 +63,17 @@ public class MyFirebaseMessagingClient extends FirebaseMessagingService {
 
     private void showNotificationMessage(Map<String, String> data) {
 
-        final String imageSender = data.get("imageSender");
-        final String imageReceiver = data.get("imageReceiver");
-        
+        String imageSender = data.get("imageSender");
+        String imageReceiver = data.get("imageReceiver");
+
         getImageSender(data, imageSender, imageReceiver);
-
-
-
     }
 
-    private void getImageSender(final Map<String, String> data, final String imageSender, final String imageReceiver) {
+
+    //Me esta crasheando cuando imageSender es null. Sin embargo, cuando debugueo, entra por onBitmapFailed (donde debería entrar)
+    // imagino que porque va más despacio y le da tiempo. Voy a controlarla fuera de esta función para que no de crash.
+
+    private void getImageSender(Map<String, String> data, String imageSender, String imageReceiver) {
         new Handler(Looper.getMainLooper()) //Cargar la imagen del usuario en la notificación.
                 .post(new Runnable() {
                     @Override
@@ -81,12 +83,15 @@ public class MyFirebaseMessagingClient extends FirebaseMessagingService {
                                 .into(new Target() {
                                     @Override
                                     public void onBitmapLoaded(Bitmap bitmapSender, Picasso.LoadedFrom from) {//Si no hay imagen no entra en este método.
-                                        getImageReceiver(data, imageReceiver, bitmapSender);
+                                        if(imageReceiver!= null && imageSender !=null)
+                                            getImageReceiver(data, imageReceiver, bitmapSender);
+
                                     }
 
                                     @Override
                                     public void onBitmapFailed(Drawable errorDrawable) {
-                                        getImageReceiver(data, imageReceiver, null);
+                                        if(imageReceiver!= null)
+                                            getImageReceiver(data, imageReceiver, null);
                                     }
 
                                     @Override
@@ -98,7 +103,7 @@ public class MyFirebaseMessagingClient extends FirebaseMessagingService {
                 });
     }
 
-    private void getImageReceiver(final Map<String, String> data, final String imageReceiver, Bitmap bitmapSender) {
+    private void getImageReceiver(Map<String, String> data, String imageReceiver, Bitmap bitmapSender) {
         Picasso.with(getApplicationContext())
                 .load(imageReceiver)
                 .into(new Target() {
@@ -145,7 +150,6 @@ public class MyFirebaseMessagingClient extends FirebaseMessagingService {
 
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
         RemoteInput remoteInput = new RemoteInput.Builder(NOTIFICATION_REPLY).setLabel("Tu mensaje...").build();
 
         final NotificationCompat.Action action = new NotificationCompat.Action.Builder(

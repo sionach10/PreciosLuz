@@ -3,8 +3,10 @@ package com.socialtravel.channel;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.Intent;
 import android.content.PeriodicSync;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -16,6 +18,9 @@ import androidx.core.app.Person;
 import androidx.core.graphics.drawable.IconCompat;
 
 import com.socialtravel.R;
+import com.socialtravel.activities.ChatActivity;
+import com.socialtravel.activities.HomeActivity;
+import com.socialtravel.fragments.ChatsFragment;
 import com.socialtravel.models.Message;
 
 import java.util.Date;
@@ -52,14 +57,24 @@ public class NotificationHelper extends ContextWrapper {
         return manager;
     }
 
+
     public NotificationCompat.Builder getNotification(String title, String body) {
+
+        //Cuando pulsamos clic en la notificación nos lleva a la pantalla de HomeActivity.
+        Intent intent = new Intent(this, ChatActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+
         return new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                 .setContentTitle(title)
                 .setContentText(body)
                 .setAutoCancel(true)
                 .setColor(Color.GRAY)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(body).setBigContentTitle(title));
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(body).setBigContentTitle(title))
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
     }
 
     public NotificationCompat.Builder getNotificationMessages(Message[] messages,
@@ -108,11 +123,19 @@ public class NotificationHelper extends ContextWrapper {
             NotificationCompat.MessagingStyle.Message message2 = new NotificationCompat.MessagingStyle.Message(m.getMessage(), m.getTimestamp(), person2);
             messagingStyle.addMessage(message2);
         }
+
+        //Cuando pulsamos clic en la notificación nos lleva a la pantalla de HomeActivity. No puedo poner ChatActivity porque me crashea porque le faltan muchos datos y me da punteros nulos.
+        Intent intent = new Intent(this, HomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+
         return new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setStyle(messagingStyle)
-                .addAction(action);
-
-
+                .addAction(action)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                ;
     }
 }
