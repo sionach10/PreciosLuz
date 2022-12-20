@@ -66,6 +66,13 @@ public class MyFirebaseMessagingClient extends FirebaseMessagingService {
         String imageSender = data.get("imageSender");
         String imageReceiver = data.get("imageReceiver");
 
+        if(imageSender == null) {
+            imageSender="IMAGEN NO VALIDA";//Ponemos algo para que sea distinto de null y no de crash el Picasso.load().
+        }
+        if(imageReceiver == null) {
+            imageReceiver="IMAGEN NO VALIDA";
+        }
+
         getImageSender(data, imageSender, imageReceiver);
     }
 
@@ -78,50 +85,60 @@ public class MyFirebaseMessagingClient extends FirebaseMessagingService {
                 .post(new Runnable() {
                     @Override
                     public void run() {
-                        Picasso.with(getApplicationContext())
-                                .load(imageSender)
-                                .into(new Target() {
-                                    @Override
-                                    public void onBitmapLoaded(Bitmap bitmapSender, Picasso.LoadedFrom from) {//Si no hay imagen no entra en este método.
-                                        if(imageReceiver!= null && imageSender !=null)
+                        //if(imageSender!= null) {
+                            Picasso.with(getApplicationContext())
+                                    .load(imageSender)
+                                    .into(new Target() {
+                                        @Override
+                                        public void onBitmapLoaded(Bitmap bitmapSender, Picasso.LoadedFrom from) {//Si no hay imagen no entra en este método.
                                             getImageReceiver(data, imageReceiver, bitmapSender);
 
-                                    }
+                                        }
 
-                                    @Override
-                                    public void onBitmapFailed(Drawable errorDrawable) {
-                                        if(imageReceiver!= null)
+                                        @Override
+                                        public void onBitmapFailed(Drawable errorDrawable) {
                                             getImageReceiver(data, imageReceiver, null);
-                                    }
+                                        }
 
-                                    @Override
-                                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+                                        @Override
+                                        public void onPrepareLoad(Drawable placeHolderDrawable) {
 
-                                    }
-                                });
+                                        }
+                                    });
+                        //}
+                        //else {
+                        //    getImageReceiver(data, imageReceiver, null);
+                        //}
+
                     }
                 });
     }
 
     private void getImageReceiver(Map<String, String> data, String imageReceiver, Bitmap bitmapSender) {
-        Picasso.with(getApplicationContext())
-                .load(imageReceiver)
-                .into(new Target() {
-                    @Override
-                    public void onBitmapLoaded(Bitmap bitmapReceiver, Picasso.LoadedFrom from) {
-                        notifyMessage(data, bitmapSender, bitmapReceiver);
-                    }
+        //if(imageReceiver != null) {
+            Picasso.with(getApplicationContext())
+                    .load(imageReceiver)
+                    .into(new Target() {
+                        @Override
+                        public void onBitmapLoaded(Bitmap bitmapReceiver, Picasso.LoadedFrom from) {
+                            notifyMessage(data, bitmapSender, bitmapReceiver);
+                        }
 
-                    @Override
-                    public void onBitmapFailed(Drawable errorDrawable) { //Entra aquí si no hay imagen.
-                        notifyMessage(data, bitmapSender, null);
-                    }
+                        @Override
+                        public void onBitmapFailed(Drawable errorDrawable) { //Entra aquí si no hay imagen.
+                            notifyMessage(data, bitmapSender, null);
+                        }
 
-                    @Override
-                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+                        @Override
+                        public void onPrepareLoad(Drawable placeHolderDrawable) {
 
-                    }
-                });
+                        }
+                    });
+        //}
+        //else {
+        //    notifyMessage(data, bitmapSender, null);
+        //}
+
     }
 
     private void notifyMessage(Map<String, String> data, Bitmap bitmapSender, Bitmap bitmapReceiver) {

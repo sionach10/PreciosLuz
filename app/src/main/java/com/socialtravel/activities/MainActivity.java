@@ -225,8 +225,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        Log.d("Campo", "email: "+ email);
-        Log.d("Campo", "Password: "+ password);
     }
 
 }

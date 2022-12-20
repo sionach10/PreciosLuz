@@ -147,14 +147,14 @@ public class EditProfileActivity extends AppCompatActivity {
                         mPhone = documentSnapshot.getString("phone");
                         mTextInputPhone.setText(mPhone);
                     }
-                    if(documentSnapshot.contains("image_profile")) {
-                        mImageProfile = documentSnapshot.getString("image_profile");
+                    if(documentSnapshot.contains("imageProfile")) {
+                        mImageProfile = documentSnapshot.getString("imageProfile");
                         if(mImageProfile != null && !mImageProfile.isEmpty()) {
                             Picasso.with(EditProfileActivity.this).load(mImageProfile).into(mCircleImageViewProfile);
                         }
                     }
-                    if(documentSnapshot.contains("image_cover")) {
-                        mImageCover = documentSnapshot.getString("image_cover");
+                    if(documentSnapshot.contains("imageCover")) {
+                        mImageCover = documentSnapshot.getString("imageCover");
                         if(mImageCover != null && !mImageCover.isEmpty()) {
                             Picasso.with(EditProfileActivity.this).load(mImageCover).into(mImageViewCover);
                         }

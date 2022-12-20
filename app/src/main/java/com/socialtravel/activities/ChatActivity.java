@@ -256,8 +256,8 @@ public class ChatActivity extends AppCompatActivity {
                         mUsernameChat = documentSnapshot.getString("username");
                         mTextViewUsername.setText(mUsernameChat);
                     }
-                    if (documentSnapshot.contains("image_profile")) {
-                        mImageReceiver = documentSnapshot.getString("image_profile");
+                    if (documentSnapshot.contains("imageProfile")) {
+                        mImageReceiver = documentSnapshot.getString("imageProfile");
                         if (mImageReceiver != null) {
                             if (!mImageReceiver.equals("")) {
                                 Picasso.with(ChatActivity.this).load(mImageReceiver).into(mCircleImageViewProfile);
@@ -407,12 +407,13 @@ public class ChatActivity extends AppCompatActivity {
         data.put("imageSender", mImageSender);
         data.put("imageReceiver", mImageReceiver);
 
+        /*
         if(mImageSender.equals("")) {
-            mImageSender = "IMAGEN_NO_VALIDA"; //Lo hacemos para que no esté vacía la variable.
+            mImageSender = "IMAGEN_NO_VALIDA"; //Lo hacemos para que no esté vacía la variable y no de error la carga de Picasso en MyFirebaseMessagingClient, pero no funciona, sigue fallando.
         }
         if(mImageReceiver.equals("")) {
             mImageReceiver = "IMAGEN_NO_VALIDA";
-        }
+        }*/
 
         String idSender = "";
         if(mAuthProvider.getUid().equals(mExtraIdUser1)) {
@@ -436,7 +437,7 @@ public class ChatActivity extends AppCompatActivity {
                     public void onResponse(Call<FCMResponse> call, Response<FCMResponse> response) {
                         if(response.body()!= null) {
                             if(response.body().getSuccess()== 1) {
-
+                                //Toast.makeText(ChatActivity.this, "Envío notificacion.", Toast.LENGTH_SHORT).show();
                             }
                             else {
                                 Toast.makeText(ChatActivity.this, "La notificación no se pudo enviar.", Toast.LENGTH_SHORT).show();
@@ -464,8 +465,8 @@ public class ChatActivity extends AppCompatActivity {
                     if(documentSnapshot.contains("username")) {
                         mMyUsername = documentSnapshot.getString("username");
                     }
-                    if(documentSnapshot.contains("image_profile")) {
-                        mImageSender = documentSnapshot.getString("image_profile");
+                    if(documentSnapshot.contains("imageProfile")) {
+                        mImageSender = documentSnapshot.getString("imageProfile");
                     }
                 }
             }

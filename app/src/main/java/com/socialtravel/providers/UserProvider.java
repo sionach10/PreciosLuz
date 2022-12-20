@@ -39,8 +39,8 @@ public class UserProvider {
         map.put( "username", user.getUsername());
         map.put( "phone", user.getPhone());
         map.put( "timestamp", new Date().getTime());
-        map.put( "image_profile", user.getImageProfile());
-        map.put( "image_cover", user.getImageCover());
+        map.put( "imageProfile", user.getImageProfile());
+        map.put( "imageCover", user.getImageCover());
         return mCollection.document(user.getId()).update(map);
     }
 

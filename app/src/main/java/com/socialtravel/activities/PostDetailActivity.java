@@ -420,9 +420,9 @@ public class PostDetailActivity extends AppCompatActivity {
                     }
                 }
                 if(documentSnapshot.exists()) {
-                    if(documentSnapshot.contains("image_profile")) {
-                        String image_profile = documentSnapshot.getString("image_profile");
-                        Picasso.with(PostDetailActivity.this).load(image_profile).into(mCircleImageViewProfile);
+                    if(documentSnapshot.contains("imageProfile")) {
+                        String imageProfile = documentSnapshot.getString("imageProfile");
+                        Picasso.with(PostDetailActivity.this).load(imageProfile).into(mCircleImageViewProfile);
                     }
                 }
             }

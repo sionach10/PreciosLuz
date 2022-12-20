@@ -200,14 +200,14 @@ public class UserProfileActivity extends AppCompatActivity {
                         String phone = documentSnapshot.getString("phone");
                         mTextViewPhone.setText(phone);
                     }
-                    if(documentSnapshot.contains("image_profile")) {
-                        String imageProfile = documentSnapshot.getString("image_profile");
+                    if(documentSnapshot.contains("imageProfile")) {
+                        String imageProfile = documentSnapshot.getString("imageProfile");
                         if(imageProfile != null && !imageProfile.isEmpty()){
                             Picasso.with(UserProfileActivity.this).load(imageProfile).into(mCircleImageProfile);
                         }
                     }
-                    if(documentSnapshot.contains("image_cover")) {
-                        String imageCover = documentSnapshot.getString("image_cover");
+                    if(documentSnapshot.contains("imageCover")) {
+                        String imageCover = documentSnapshot.getString("imageCover");
                         if(imageCover != null && !imageCover.isEmpty()){
                             Picasso.with(UserProfileActivity.this).load(imageCover).into(mImageViewCover);
                         }

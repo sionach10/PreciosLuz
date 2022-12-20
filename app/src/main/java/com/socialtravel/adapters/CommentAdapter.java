@@ -58,8 +58,8 @@ public class CommentAdapter extends FirestoreRecyclerAdapter <Comment, CommentAd
                         String username = documentSnapshot.getString("username");
                         holder.textViewUsername.setText(username.toUpperCase(Locale.ROOT));
                     }
-                    if(documentSnapshot.contains("image_profile")) {
-                        String imageProfile = documentSnapshot.getString("image_profile");
+                    if(documentSnapshot.contains("imageProfile")) {
+                        String imageProfile = documentSnapshot.getString("imageProfile");
                         if(imageProfile != null) {
                             if(!imageProfile.isEmpty()) {
                                Picasso.with(context).load(imageProfile).into(holder.circleImageComment); //Para traer una URL necesitamos la libreria Picasso.
