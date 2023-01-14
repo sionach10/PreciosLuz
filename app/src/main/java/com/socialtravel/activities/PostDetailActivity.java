@@ -266,7 +266,7 @@ public class PostDetailActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<Void> task) {
                 if(task.isSuccessful()) {
                     sendNotification(value);
-                    Toast.makeText(PostDetailActivity.this, "El comentario se creó correctamente.", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(PostDetailActivity.this, "El comentario se creó correctamente.", Toast.LENGTH_SHORT).show();
                 }
                 else {
                     Toast.makeText(PostDetailActivity.this, "Error al guardar el comentario.", Toast.LENGTH_SHORT).show();
@@ -294,7 +294,7 @@ public class PostDetailActivity extends AppCompatActivity {
                             public void onResponse(Call<FCMResponse> call, Response<FCMResponse> response) {
                                 if(response.body()!= null) {
                                     if(response.body().getSuccess()== 1) {
-                                        Toast.makeText(PostDetailActivity.this, "Notificación enviada correctamente.", Toast.LENGTH_SHORT).show();
+                                        //Toast.makeText(PostDetailActivity.this, "Notificación enviada correctamente.", Toast.LENGTH_SHORT).show();
                                     }
                                     else {
                                         Toast.makeText(PostDetailActivity.this, "La notificación no se pudo enviar.", Toast.LENGTH_SHORT).show();

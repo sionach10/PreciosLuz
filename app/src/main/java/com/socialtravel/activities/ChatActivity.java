@@ -284,7 +284,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 int size = queryDocumentSnapshots.size();
-                Toast.makeText(ChatActivity.this, "El chat existe", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(ChatActivity.this, "El chat existe", Toast.LENGTH_SHORT).show();
                 if(size == 0){
                     createChat();
                 }

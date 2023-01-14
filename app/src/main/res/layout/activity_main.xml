@@ -24,21 +24,14 @@
                 android:background="@color/design_default_color_primary"/>
 
             <ImageView
-                android:layout_width="130dp"
-                android:layout_height="130dp"
-                android:layout_gravity="center|top"
-                android:src="@drawable/ic_person" /> <!--TODO: Pegar aquí el logo de la App.-->
-
-            <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Título de la App"
-                android:layout_gravity="center"
-                android:textAlignment="center"
-                android:textColor="@color/white"
-                android:textStyle="bold"
-                android:textSize="30dp"
-                android:layout_marginTop="10dp"/>
+                android:layout_gravity="center|top"
+                android:src="@drawable/titulosocialtravel"
+                android:layout_marginBottom="60dp"
+                android:padding="20dp"/>
+
+
 
         </FrameLayout>
 
