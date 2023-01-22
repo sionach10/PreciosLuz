@@ -19,6 +19,9 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -62,10 +65,6 @@ public class PostActivity extends AppCompatActivity {
     AuthProvider mAuthProvider;
     TextInputEditText mTextInputTitle;
     TextInputEditText mTextInputDescription;
-    ImageView mImageViewPC;
-    ImageView mImageViewPS4;
-    ImageView mImageViewXbox;
-    ImageView mImageViewNintendo;
     CircleImageView mCircleImageBack;
     TextView mTextViewCategory;
     String mCategory = null;
@@ -77,6 +76,12 @@ public class PostActivity extends AppCompatActivity {
     enum fuenteImagen { camara, galeria}
     fuenteImagen mFuenteImagen;
     int imageSelected;
+
+    //FiltroCategorias.
+    String[] itemsFiltro = {"Salir de Fiesta", "Conocer Gente", "Quedadas Deportes", "Clases Online", "Planear Viajes", "Otros"};
+    AutoCompleteTextView autoCompleteTextView;
+    ArrayAdapter<String> adapterItems;
+
 
     //Foto 1
     String mAbsolutePhotoPath;
@@ -106,12 +111,11 @@ public class PostActivity extends AppCompatActivity {
         mButtonPost = findViewById(R.id.btnPost);
         mTextInputTitle = findViewById(R.id.textInputVideoGame);
         mTextInputDescription = findViewById(R.id.textInputDescription);
-        mImageViewPC = findViewById(R.id.imageViewPC);
-        mImageViewPS4 = findViewById(R.id.imageViewPS4);
-        mImageViewXbox = findViewById(R.id.imageViewXbox);
-        mImageViewNintendo = findViewById(R.id.imageViewNintendo);
         mTextViewCategory = findViewById(R.id.textViewCategory);
         mCircleImageBack = findViewById(R.id.circleImageBack);
+        autoCompleteTextView = findViewById(R.id.autoCompleteFilter);
+        adapterItems = new ArrayAdapter<String>(this, R.layout.list_item, itemsFiltro);
+        autoCompleteTextView.setAdapter(adapterItems);
 
         mCircleImageBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,35 +148,11 @@ public class PostActivity extends AppCompatActivity {
             }
         });
 
-        mImageViewPC.setOnClickListener(new View.OnClickListener() {
+        autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
-                mCategory = "PC";
-                mTextViewCategory.setText(mCategory);
-            }
-        });
-
-        mImageViewPS4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mCategory = "PS4";
-                mTextViewCategory.setText(mCategory);
-            }
-        });
-
-        mImageViewXbox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mCategory = "XBOX";
-                mTextViewCategory.setText(mCategory);
-            }
-        });
-
-        mImageViewNintendo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mCategory = "NINTENDO";
-                mTextViewCategory.setText(mCategory);
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String item = parent.getItemAtPosition(position).toString();
+                Toast.makeText(getApplicationContext(), "Item: "+item, Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -332,8 +312,8 @@ public class PostActivity extends AppCompatActivity {
         mTextInputTitle.setText("");
         mTextInputDescription.setText("");
         mTextViewCategory.setText("");
-        mImageViewPost1.setImageResource(R.drawable.upload_image);
-        mImageViewPost2.setImageResource(R.drawable.upload_image);
+        mImageViewPost1.setImageResource(R.mipmap.upload_image);
+        mImageViewPost2.setImageResource(R.mipmap.upload_image);
         mTitle = "";
         mdescription = "";
         mCategory = "";
