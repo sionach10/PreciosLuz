@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.socialtravel">
+    package="com.precioLuz">
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -22,27 +22,27 @@
         android:theme="@style/Theme.SocialTravel"
         tools:targetApi="31">
         <activity
-            android:name=".activities.ChatActivity"
+            android:name="com.precioLuz.activities.ChatActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.FiltersActivity"
+            android:name="com.precioLuz.activities.FiltersActivity"
             android:exported="false"
-            android:parentActivityName=".activities.HomeActivity" />
+            android:parentActivityName="com.precioLuz.activities.HomeActivity" />
         <activity
-            android:name=".activities.UserProfileActivity"
+            android:name="com.precioLuz.activities.UserProfileActivity"
             android:exported="false"
-            android:parentActivityName=".activities.PostDetailActivity" />
+            android:parentActivityName="com.precioLuz.activities.PostDetailActivity" />
         <activity
-            android:name=".activities.PostDetailActivity"
+            android:name="com.precioLuz.activities.PostDetailActivity"
             android:exported="false"
-            android:parentActivityName=".activities.HomeActivity" />
+            android:parentActivityName="com.precioLuz.activities.HomeActivity" />
         <activity
-            android:name=".activities.EditProfileActivity"
+            android:name="com.precioLuz.activities.EditProfileActivity"
             android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.socialtravel"
+            android:authorities="com.precioLuz"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -51,20 +51,20 @@
         </provider>
 
         <activity
-            android:name=".activities.PostActivity"
+            android:name="com.precioLuz.activities.PostActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.CompleteProfileActivity"
+            android:name="com.precioLuz.activities.CompleteProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.HomeActivity"
+            android:name="com.precioLuz.activities.HomeActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustNothing" /> <!-- Para que al hacer clic en la busqueda y aparezca el teclado, no se descuadre el bottomNavigation -->
         <activity
-            android:name=".activities.RegisterActivity"
+            android:name="com.precioLuz.activities.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.MainActivity"
+            android:name="com.precioLuz.activities.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -74,7 +74,7 @@
         </activity>
 
         <service
-            android:name=".services.MyFirebaseMessagingClient"
+            android:name="com.precioLuz.services.MyFirebaseMessagingClient"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
@@ -85,7 +85,7 @@
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/default_notification_channel_id" />
 
-        <receiver android:name=".receivers.MessageReceiver"
+        <receiver android:name="com.precioLuz.receivers.MessageReceiver"
             android:enabled="true"
             android:exported="false"/>
 
