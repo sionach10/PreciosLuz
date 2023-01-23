@@ -151,8 +151,7 @@ public class PostActivity extends AppCompatActivity {
         autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String item = parent.getItemAtPosition(position).toString();
-                Toast.makeText(getApplicationContext(), "Item: "+item, Toast.LENGTH_LONG).show();
+                mCategory = parent.getItemAtPosition(position).toString();
             }
         });
     }
@@ -231,7 +230,7 @@ public class PostActivity extends AppCompatActivity {
             }
             //1 GALERIA, 2 CAMARA.
             else if(mImageFile != null && mPhotoFile2!= null){
-                saveImage(mPhotoFile, mPhotoFile2);
+                saveImage(mImageFile, mPhotoFile2);
             }
             else {
                 Toast.makeText(this, "Imagenes vacías.", Toast.LENGTH_LONG).show();
@@ -279,6 +278,7 @@ public class PostActivity extends AppCompatActivity {
                                                         if(taskSave.isSuccessful()) {
                                                             //Toast.makeText(PostActivity.this, "La información se almacenó correctamente.", Toast.LENGTH_LONG).show();
                                                             clearForm();
+
                                                         }
                                                         else {
                                                             Toast.makeText(PostActivity.this, "No se pudo almacenar la configuración.", Toast.LENGTH_LONG).show();
