@@ -12,6 +12,7 @@ import com.precioLuz.databinding.ActivityMainBinding;
 import com.precioLuz.fragments.ChatsFragment;
 import com.precioLuz.fragments.FiltersFragment;
 import com.precioLuz.fragments.HomeFragment;
+import com.precioLuz.fragments.PricesFragment;
 import com.precioLuz.fragments.ProfileFragment;
 import com.precioLuz.providers.AuthProvider;
 import com.precioLuz.providers.TokenProvider;
@@ -54,7 +55,7 @@ public class HomeActivity extends AppCompatActivity {
         mAuthProvider = new AuthProvider();
         mUserProvider = new UserProvider();
 
-        openFragment(new HomeFragment());
+        openFragment(new PricesFragment());
         createToken();
     }
 

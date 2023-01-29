@@ -40,7 +40,7 @@ public class HomeFragment extends Fragment implements MaterialSearchBar.OnSearch
     PostsAdapter mPostAdapterSearch;
 
     public HomeFragment() {
-        // Required empty public constructor
+        //Required empty public constructor
     }
 
     @Override
