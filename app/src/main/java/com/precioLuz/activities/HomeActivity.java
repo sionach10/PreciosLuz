@@ -35,7 +35,7 @@ public class HomeActivity extends AppCompatActivity {
         binding.bottomNavigation.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.itemHome:
-                    openFragment(new HomeFragment());
+                    openFragment(new PricesFragment());
                     return true;
                 case R.id.itemFilters:
                     openFragment(new FiltersFragment());

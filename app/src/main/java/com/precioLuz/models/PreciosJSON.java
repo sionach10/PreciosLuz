@@ -9,6 +9,11 @@ public class PreciosJSON {
     private double price;
     private String units;
 
+    //Constructor vacío.
+    public PreciosJSON() {
+
+    }
+
     public PreciosJSON(String date, String hour, boolean isCheap, boolean isUnderAvg, String market, double price, String units) {
         this.date = date;
         this.hour = hour;

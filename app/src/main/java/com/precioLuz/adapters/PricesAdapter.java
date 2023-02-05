@@ -15,8 +15,8 @@ import java.util.List;
 
 public class PricesAdapter extends ArrayAdapter {
 
-    public PricesAdapter (Context context, List objects) {
-        super (context, 0, objects);
+    public PricesAdapter(Context context, String[] hours) {
+        super (context, 0, hours);
     }
 
     @Override

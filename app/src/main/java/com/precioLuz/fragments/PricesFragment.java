@@ -1,5 +1,6 @@
 package com.precioLuz.fragments;
 
+import static android.content.ContentValues.TAG;
 import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
 
 import android.content.Context;
@@ -7,7 +8,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Debug;
+import android.os.Handler;
 import android.util.JsonReader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,13 +19,25 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
 import com.precioLuz.R;
 import com.precioLuz.adapters.PricesAdapter;
 import com.precioLuz.models.PreciosJSON;
 import com.precioLuz.utils.JsonPricesParser;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -31,6 +47,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -43,8 +60,7 @@ public class PricesFragment extends Fragment {
     View mView;
     Toolbar mToolbar;
     ListView listaItemsPrecios;
-    ArrayAdapter adaptador;
-    HttpURLConnection connection;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -55,70 +71,42 @@ public class PricesFragment extends Fragment {
         mToolbar = mView.findViewById(R.id.toolbar);
         listaItemsPrecios= mView.findViewById(R.id.listaItemsPrecios);
 
-        try {
-            new JsonTask().execute(new URL("https://api.preciodelaluz.org/v1/prices/all?zone=PCB"));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
         return mView;
     }
 
-    public class JsonTask extends AsyncTask<URL, Void, List<PreciosJSON>> {
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        @Override
-        protected List<PreciosJSON> doInBackground(URL... urls) {
-            List<PreciosJSON> preciosJSONList = null;
+        leerWS();
 
-            try {
-                // Establecer la conexión
-                connection = (HttpURLConnection)urls[0].openConnection();
-                connection.setConnectTimeout(15000);
-                connection.setReadTimeout(10000);
-
-                // Obtener el estado del recurso
-                int statusCode = connection.getResponseCode();
-
-                if(statusCode!=200) { //Si no es correcta la respuesta, rellenamos el array con errores.
-                    preciosJSONList = new ArrayList<>();
-                    preciosJSONList.add(new PreciosJSON("error", null, false, false, null, 0, null ));
-
-                } else {
-
-                    // Parsear el flujo con formato JSON
-                    InputStream in = new BufferedInputStream(connection.getInputStream());
-
-                    JsonPricesParser parser = new JsonPricesParser();
-                    //GsonAnimalParser parser = new GsonAnimalParser();
-
-                    preciosJSONList = parser.readJsonStream(in);
-
-
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-
-            }finally {
-                connection.disconnect();
-            }
-            return preciosJSONList;
-        }
-
-        @Override
-        protected void onPostExecute(List<PreciosJSON> preciosJSONList) {
-            //Asignar los objetos de Json parseados al adaptador
-            if(preciosJSONList!=null) {
-                adaptador = new PricesAdapter(getContext(), preciosJSONList);
-                listaItemsPrecios.setAdapter(adaptador);
-            }else{
-                Toast.makeText(
-                                getContext(),
-                                "Ocurrió un error de Parsing Json",
-                                Toast.LENGTH_SHORT)
-                        .show();
-            }
-
-        }
     }
+
+    private void leerWS() {
+        String url = "https://api.preciodelaluz.org/v1/prices/all?zone=PCB";
+        StringRequest postRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject jsonObject = new JSONObject(response);//Recibimos el JSON.
+
+                    //Lo parseamos a un objeto del tipo PreciosJSON.
+                    PreciosJSON[] preciosJSON = JsonPricesParser.obtenerJsonHoras(jsonObject);
+
+                    //Pendiente hacer el adapter y que pinte los PreciosJSON.
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+        Volley.newRequestQueue(requireContext()).add(postRequest);
+    }
+
 
 }
