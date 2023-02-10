@@ -11,13 +11,14 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <TextView
+        <ImageView
             android:id="@+id/priceColor"
-            android:layout_width="20dp"
+            android:layout_width="40dp"
             android:layout_height="match_parent"
+            android:src="@drawable/mood_green"
             android:layout_marginLeft="15dp"
             android:layout_marginTop="15dp"
-            android:background="@color/verde" />
+             />
 
         <TextView
             android:id="@+id/hour"

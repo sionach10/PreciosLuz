@@ -56,7 +56,7 @@ public class JsonPricesParser {
             _horasPrecios[i].setCheap(horasJSON[i].getBoolean("is-cheap"));
             _horasPrecios[i].setUnderAvg(horasJSON[i].getBoolean("is-under-avg"));
             _horasPrecios[i].setMarket(horasJSON[i].getString("market"));
-            _horasPrecios[i].setPrice(horasJSON[i].getDouble("price"));
+            _horasPrecios[i].setPrice(horasJSON[i].getString("price"));
             _horasPrecios[i].setUnits(horasJSON[i].getString("units"));
         }
 

@@ -1,23 +1,12 @@
 package com.precioLuz.fragments;
 
-import static android.content.ContentValues.TAG;
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
-
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Debug;
-import android.os.Handler;
-import android.util.JsonReader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,26 +18,18 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.gson.Gson;
 import com.precioLuz.R;
 import com.precioLuz.adapters.PricesAdapter;
 import com.precioLuz.models.PreciosJSON;
 import com.precioLuz.utils.JsonPricesParser;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 
 public class PricesFragment extends Fragment {
@@ -60,6 +41,9 @@ public class PricesFragment extends Fragment {
     View mView;
     Toolbar mToolbar;
     ListView listaItemsPrecios;
+    TextView fecha;
+    List<PreciosJSON> mList = new ArrayList<>();
+    PricesAdapter mAdapter;
 
 
     @Override
@@ -70,6 +54,7 @@ public class PricesFragment extends Fragment {
         mView = inflater.inflate(R.layout.fragment_prices, container, false);
         mToolbar = mView.findViewById(R.id.toolbar);
         listaItemsPrecios= mView.findViewById(R.id.listaItemsPrecios);
+        fecha = mView.findViewById(R.id.date);
 
         return mView;
     }
@@ -93,7 +78,16 @@ public class PricesFragment extends Fragment {
                     //Lo parseamos a un objeto del tipo PreciosJSON.
                     PreciosJSON[] preciosJSON = JsonPricesParser.obtenerJsonHoras(jsonObject);
 
-                    //Pendiente hacer el adapter y que pinte los PreciosJSON.
+                    //Añadimos los preciosJSON a una lista.
+                    mList.addAll(Arrays.asList(preciosJSON));
+
+                    //Modificamos campo fecha.
+                    fecha.setText(preciosJSON[0].getDate());
+
+                    //Creamos el adaptador con los datos de la lista.
+                    mAdapter = new PricesAdapter(requireContext(),R.layout.item_lista_precios, mList);
+
+                    listaItemsPrecios.setAdapter(mAdapter);
 
                 } catch (JSONException e) {
                     e.printStackTrace();

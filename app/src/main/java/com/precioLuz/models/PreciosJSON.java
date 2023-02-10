@@ -6,15 +6,13 @@ public class PreciosJSON {
     private boolean isCheap;
     private boolean isUnderAvg;
     private String market;
-    private double price;
+    private String price;
     private String units;
 
     //Constructor vacío.
-    public PreciosJSON() {
+    public PreciosJSON() {}
 
-    }
-
-    public PreciosJSON(String date, String hour, boolean isCheap, boolean isUnderAvg, String market, double price, String units) {
+    public PreciosJSON(String date, String hour, boolean isCheap, boolean isUnderAvg, String market, String price, String units) {
         this.date = date;
         this.hour = hour;
         this.isCheap = isCheap;
@@ -64,11 +62,11 @@ public class PreciosJSON {
         this.market = market;
     }
 
-    public double getPrice() {
+    public String getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(String price) {
         this.price = price;
     }
 
