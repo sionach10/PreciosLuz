@@ -1,65 +1,75 @@
 package com.precioLuz.utils;
 
+import android.content.Intent;
+import android.os.Build;
 import android.os.Debug;
+import android.util.Log;
 
+import androidx.annotation.RequiresApi;
+
+import com.google.type.DateTime;
 import com.precioLuz.models.PreciosJSON;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
+
 public class JsonPricesParser {
 
-    public static PreciosJSON[] obtenerJsonHoras(JSONObject jsonObject) throws JSONException {
+    public static PreciosJSON[] obtenerJsonHoras(JSONObject jsonObject, String[] fechas) throws JSONException {
 
-        JSONObject[] horasJSON = new JSONObject[24];
-        PreciosJSON[] horasPrecios;
+        ArrayList<String> listaPrecios = new ArrayList<>();
+        ArrayList<String> listaHoras = new ArrayList<>();
 
-        horasJSON[0] = jsonObject.getJSONObject("00-01");
-        horasJSON[1] = jsonObject.getJSONObject("01-02");
-        horasJSON[2] = jsonObject.getJSONObject("02-03");
-        horasJSON[3] = jsonObject.getJSONObject("03-04");
-        horasJSON[4] = jsonObject.getJSONObject("04-05");
-        horasJSON[5] = jsonObject.getJSONObject("05-06");
-        horasJSON[6] = jsonObject.getJSONObject("06-07");
-        horasJSON[7] = jsonObject.getJSONObject("07-08");
-        horasJSON[8] = jsonObject.getJSONObject("08-09");
-        horasJSON[9] = jsonObject.getJSONObject("09-10");
-        horasJSON[10] = jsonObject.getJSONObject("10-11");
-        horasJSON[11] = jsonObject.getJSONObject("11-12");
-        horasJSON[12] = jsonObject.getJSONObject("12-13");
-        horasJSON[13] = jsonObject.getJSONObject("13-14");
-        horasJSON[14] = jsonObject.getJSONObject("14-15");
-        horasJSON[15] = jsonObject.getJSONObject("15-16");
-        horasJSON[16] = jsonObject.getJSONObject("16-17");
-        horasJSON[17] = jsonObject.getJSONObject("17-18");
-        horasJSON[18] = jsonObject.getJSONObject("18-19");
-        horasJSON[19] = jsonObject.getJSONObject("19-20");
-        horasJSON[20] = jsonObject.getJSONObject("20-21");
-        horasJSON[21] = jsonObject.getJSONObject("21-22");
-        horasJSON[22] = jsonObject.getJSONObject("22-23");
-        horasJSON[23] = jsonObject.getJSONObject("23-24");
+        PreciosJSON[] preciosJSON;
 
-        horasPrecios = parserPreciosJSON(horasJSON);
+        JSONArray jsonValues = jsonObject.getJSONObject("indicator").getJSONArray("values");
 
-        return horasPrecios;
+        for(int i=0; i<24; i++) { //Como en la API viene a parte de las 24h del día, la primera hora del día siguiente, debemos limitar el for a 24 periodos.
+            JSONObject json = jsonValues.getJSONObject(i);
+            listaPrecios.add(json.getString("value"));
+            listaHoras.add(json.getString("datetime"));
+        }
+
+        preciosJSON = parserJSON(listaPrecios, listaHoras);
+
+        return preciosJSON;
     }
 
     //Convertimos los JSONObject en objetos tipo PreciosJSON
-    private static PreciosJSON[] parserPreciosJSON(JSONObject[] horasJSON) throws JSONException {
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private static PreciosJSON[] parserJSON(ArrayList<String> _listaPrecios, ArrayList<String> _listaHoras) throws JSONException {
 
-        PreciosJSON[] _horasPrecios = new PreciosJSON[24];
+        PreciosJSON[] _preciosJSON = new PreciosJSON[24];
+        float suma = 0;
+        float media = 0;
+        DecimalFormat df = new DecimalFormat("00");
 
-        for(int i=0; i<horasJSON.length; i++) {
-            _horasPrecios[i] = new PreciosJSON(); //Necesario inicializar el objeto.
-            _horasPrecios[i].setDate(horasJSON[i].getString("date"));
-            _horasPrecios[i].setHour(horasJSON[i].getString("hour"));
-            _horasPrecios[i].setCheap(horasJSON[i].getBoolean("is-cheap"));
-            _horasPrecios[i].setUnderAvg(horasJSON[i].getBoolean("is-under-avg"));
-            _horasPrecios[i].setMarket(horasJSON[i].getString("market"));
-            _horasPrecios[i].setPrice(horasJSON[i].getString("price"));
-            _horasPrecios[i].setUnits(horasJSON[i].getString("units"));
+        for(int i=0; i<_listaPrecios.size(); i++) {
+            _preciosJSON[i] = new PreciosJSON(); //Necesario inicializar el objeto.
+            int nextHour = Integer.parseInt(_listaHoras.get(i).substring(11,13))+1;
+            String nextHourS = df.format(nextHour);
+
+            _preciosJSON[i].setHour(_listaHoras.get(i).substring(11,13)+"-"+ nextHourS+"h");
+            _preciosJSON[i].setPrice(_listaPrecios.get(i));
+            suma+=Float.parseFloat(_listaPrecios.get(i));
         }
 
-        return _horasPrecios;
+        media = suma/_listaPrecios.size();
+
+        for(int i=0; i<_listaPrecios.size(); i++){
+            _preciosJSON[i].setCheap(Float.parseFloat(_listaPrecios.get(i)) <= media); //Forma rapida de asignar true/false.
+            _preciosJSON[i].setUnderAvg(Float.parseFloat(_listaPrecios.get(i)) <= media);
+        }
+
+        return _preciosJSON;
     }
+
 }

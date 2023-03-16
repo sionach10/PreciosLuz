@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -24,6 +25,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.precioLuz.R;
 import com.precioLuz.adapters.PricesAdapter;
 import com.precioLuz.models.PreciosJSON;
@@ -55,12 +57,17 @@ public class PricesFragment extends Fragment {
     List<PreciosJSON> mList = new ArrayList<>();
     PricesAdapter mAdapter;
     ImageButton btnCalendar;
+    SwitchMaterial switchEnergia;
+
 
     private final Calendar mCalendar = Calendar.getInstance();
     private final int day = mCalendar.get(Calendar.DAY_OF_MONTH);
     private final int month = mCalendar.get(Calendar.MONTH); //Los meses los devuelve de 0 a 11.
     private final int year = mCalendar.get(Calendar.YEAR);
     String [] fechasBusqueda = new String[2];
+    String [] fechasDefault = new String[2];
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -73,6 +80,42 @@ public class PricesFragment extends Fragment {
         listaItemsPrecios= mView.findViewById(R.id.listaItemsPrecios);
         fecha = mView.findViewById(R.id.date);
         btnCalendar = mView.findViewById(R.id.btnCalendar);
+        switchEnergia = mView.findViewById(R.id.switchEnergia);
+
+        switchEnergia.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked) {
+                    switchEnergia.setText("MWh");
+                    //Creamos el adaptador con los datos de la lista.
+                    mAdapter = new PricesAdapter(requireContext(),R.layout.item_lista_precios, mList, isChecked); //TODO
+
+                    //Vaciamos la lista al cambiar de día:
+                    listaItemsPrecios.setAdapter(null);
+
+                    //Cargamos los datos del adapter a la vista.
+                    listaItemsPrecios.setAdapter(mAdapter);
+                }
+                else{
+                    switchEnergia.setText("KWh");
+                    //Creamos el adaptador con los datos de la lista.
+                    mAdapter = new PricesAdapter(requireContext(),R.layout.item_lista_precios, mList, isChecked); //TODO
+
+                    //Vaciamos la lista al cambiar de día:
+                    listaItemsPrecios.setAdapter(null);
+
+                    //Cargamos los datos del adapter a la vista.
+                    listaItemsPrecios.setAdapter(mAdapter);
+                }
+            }
+        });
+
+        //Inicializamos las fechas de hoy y mañana por defecto.
+        try {
+            fechasDefault = obtenerFechasFromDatePicker(day, month+1, year);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         return mView;
     }
@@ -82,8 +125,7 @@ public class PricesFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        leerWS();
-        //leerWSESIOS();
+        leerWSESIOS(fechasDefault);
 
         btnCalendar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,42 +172,6 @@ public class PricesFragment extends Fragment {
         return _fechasBusqueda;
     }
 
-
-    private void leerWS() {
-        String url = "https://api.preciodelaluz.org/v1/prices/all?zone=PCB";
-        StringRequest postRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                try {
-                    JSONObject jsonObject = new JSONObject(response);//Recibimos el JSON.
-
-                    //Lo parseamos a un objeto del tipo PreciosJSON.
-                    PreciosJSON[] preciosJSON = JsonPricesParser.obtenerJsonHoras(jsonObject);
-
-                    //Añadimos los preciosJSON a una lista.
-                    mList.addAll(Arrays.asList(preciosJSON));
-
-                    //Modificamos campo fecha.
-                    fecha.setText(preciosJSON[0].getDate());
-
-                    //Creamos el adaptador con los datos de la lista.
-                    mAdapter = new PricesAdapter(requireContext(),R.layout.item_lista_precios, mList);
-
-                    listaItemsPrecios.setAdapter(mAdapter);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-            }
-        });
-        Volley.newRequestQueue(requireContext()).add(postRequest);
-    }
-
     private void leerWSESIOS(String [] _fechasBusqueda) {
 
         String url = "https://api.esios.ree.es/indicators/10391?geo_ids[]=8741&start_date="+_fechasBusqueda[0]+"&end_date="+_fechasBusqueda[1];
@@ -176,17 +182,21 @@ public class PricesFragment extends Fragment {
                     JSONObject jsonObject = new JSONObject(response);//Recibimos el JSON.
 
                     //Lo parseamos a un objeto del tipo PreciosJSON.
-                    PreciosJSON[] preciosJSON = JsonPricesParser.obtenerJsonHoras(jsonObject);
+                    PreciosJSON[] preciosJSON = JsonPricesParser.obtenerJsonHoras(jsonObject, _fechasBusqueda);
 
                     //Añadimos los preciosJSON a una lista.
                     mList.addAll(Arrays.asList(preciosJSON));
 
                     //Modificamos campo fecha.
-                    fecha.setText(preciosJSON[0].getDate());
+                    fecha.setText(_fechasBusqueda[0]);
 
                     //Creamos el adaptador con los datos de la lista.
-                    mAdapter = new PricesAdapter(requireContext(),R.layout.item_lista_precios, mList);
+                    mAdapter = new PricesAdapter(requireContext(),R.layout.item_lista_precios, mList, switchEnergia.isChecked()); //TODO
 
+                    //Vaciamos la lista al cambiar de día:
+                    listaItemsPrecios.setAdapter(null);
+
+                    //Cargamos los datos del adapter a la vista.
                     listaItemsPrecios.setAdapter(mAdapter);
 
                 } catch (JSONException e) {
@@ -202,7 +212,7 @@ public class PricesFragment extends Fragment {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headers = new HashMap<String, String>();
-                headers.put("Authorization", "Token token=\"f8b7eac4ecd150b5e83f2e2f8c218064c8afb9e33eadcd077eef7b243f69bd46\"");
+                headers.put("x-api-key", "f8b7eac4ecd150b5e83f2e2f8c218064c8afb9e33eadcd077eef7b243f69bd46");
                 return headers;
             }
         };

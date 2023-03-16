@@ -1,33 +1,19 @@
 package com.precioLuz.models;
 
 public class PreciosJSON {
-    private String date;
     private String hour;
     private boolean isCheap;
     private boolean isUnderAvg;
-    private String market;
     private String price;
-    private String units;
 
     //Constructor vacío.
     public PreciosJSON() {}
 
     public PreciosJSON(String date, String hour, boolean isCheap, boolean isUnderAvg, String market, String price, String units) {
-        this.date = date;
         this.hour = hour;
         this.isCheap = isCheap;
         this.isUnderAvg = isUnderAvg;
-        this.market = market;
         this.price = price;
-        this.units = units;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
     }
 
     public String getHour() {
@@ -54,27 +40,11 @@ public class PreciosJSON {
         isUnderAvg = underAvg;
     }
 
-    public String getMarket() {
-        return market;
-    }
-
-    public void setMarket(String market) {
-        this.market = market;
-    }
-
     public String getPrice() {
         return price;
     }
 
     public void setPrice(String price) {
         this.price = price;
-    }
-
-    public String getUnits() {
-        return units;
-    }
-
-    public void setUnits(String units) {
-        this.units = units;
     }
 }

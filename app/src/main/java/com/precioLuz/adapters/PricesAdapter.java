@@ -22,14 +22,16 @@ public class PricesAdapter extends ArrayAdapter<PreciosJSON> {
     private List<PreciosJSON> mList;
     private Context mContext;
     private int resourceLayout;
+    private boolean switchEnergia;
     private final String magnitud = " €/KWh";
     private DecimalFormat formato2d = new DecimalFormat("#.##");
     //Constructor
-    public PricesAdapter(@NonNull Context context, int resource, List<PreciosJSON> objects) {
+    public PricesAdapter(@NonNull Context context, int resource, List<PreciosJSON> objects, boolean switchEnergia) {
         super(context, resource, objects);
         this.mList = objects;
         this.mContext = context;
         this.resourceLayout = resource;
+        this.switchEnergia = switchEnergia;
     }
 
     @Override
@@ -56,13 +58,24 @@ public class PricesAdapter extends ArrayAdapter<PreciosJSON> {
 
         //date.setText(item.getDate());
         hour.setText(item.getHour());
-        //Adaptamos valor a KWh:
-        float division = Float.parseFloat(item.getPrice())/1000.0f;
-        price.setText(formato2d.format(division) + magnitud);
-        if(item.isCheap())
-            priceColor.setImageResource(R.drawable.mood_green);
-        else
-            priceColor.setImageResource(R.drawable.mood_red);
+        //Adaptamos valor a KWh/MWh:
+        if(switchEnergia) { //MWh
+            float division = Float.parseFloat(item.getPrice());
+            price.setText(formato2d.format(division) + magnitud);
+            if(item.isCheap())
+                priceColor.setImageResource(R.drawable.mood_green);
+            else
+                priceColor.setImageResource(R.drawable.mood_red);
+        }
+        else { //KWh
+            float division = Float.parseFloat(item.getPrice())/1000.0f;
+            price.setText(formato2d.format(division) + magnitud);
+            if(item.isCheap())
+                priceColor.setImageResource(R.drawable.mood_green);
+            else
+                priceColor.setImageResource(R.drawable.mood_red);
+        }
+
 
         //Devolver al ListView la fila creada
         return mView;
