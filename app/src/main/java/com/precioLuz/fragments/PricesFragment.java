@@ -64,9 +64,9 @@ public class PricesFragment extends Fragment {
 
 
     private final Calendar mCalendar = Calendar.getInstance();
-    private final int day = mCalendar.get(Calendar.DAY_OF_MONTH);
-    private final int month = mCalendar.get(Calendar.MONTH); //Los meses los devuelve de 0 a 11.
-    private final int year = mCalendar.get(Calendar.YEAR);
+    private final int startDay = mCalendar.get(Calendar.DAY_OF_MONTH);
+    private final int startMonth = mCalendar.get(Calendar.MONTH); //Los meses los devuelve de 0 a 11.
+    private final int startYear = mCalendar.get(Calendar.YEAR);
     String [] fechasBusqueda = new String[2];
     String [] fechasDefault = new String[2];
 
@@ -88,7 +88,7 @@ public class PricesFragment extends Fragment {
 
         //Inicializamos las fechas de hoy y mañana por defecto.
         try {
-            fechasDefault = obtenerFechasFromDatePicker(day, month+1, year);
+            fechasDefault = obtenerFechasFromDatePicker(startDay, startMonth+1, startYear);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -110,6 +110,7 @@ public class PricesFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
+
                 DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int _year, int _month, int _dayOfMonth) {
@@ -122,7 +123,8 @@ public class PricesFragment extends Fragment {
                             e.printStackTrace();
                         }
                     }
-                }, year, month, day); //Variables para inicializar el calendario en el día de hoy.
+                }, startYear, startMonth, startDay); //Variables para inicializar el calendario en el día de hoy.+
+                datePickerDialog.getDatePicker().setMaxDate(mCalendar.getTimeInMillis());//bloqueamos que no hagan clic en fechas futuras.
                 datePickerDialog.show();
             }
         });
