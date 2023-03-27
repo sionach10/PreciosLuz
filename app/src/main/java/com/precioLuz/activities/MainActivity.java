@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     SignInButton mButtonGoogle;
     private GoogleSignInClient mGoogleSignInClient;
     UserProvider mUserProvider;
-    SpotsDialog mDialog; //Hola.
+    SpotsDialog mDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

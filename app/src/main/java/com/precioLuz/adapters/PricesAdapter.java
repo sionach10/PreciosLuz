@@ -23,7 +23,8 @@ public class PricesAdapter extends ArrayAdapter<PreciosJSON> {
     private Context mContext;
     private int resourceLayout;
     private boolean switchEnergia;
-    private final String magnitud = " €/KWh";
+    private final String magnitudKwh = " €/KWh";
+    private final String magnitudMwh = " €/MWh";
     private DecimalFormat formato2d = new DecimalFormat("#.##");
     //Constructor
     public PricesAdapter(@NonNull Context context, int resource, List<PreciosJSON> objects, boolean switchEnergia) {
@@ -61,7 +62,7 @@ public class PricesAdapter extends ArrayAdapter<PreciosJSON> {
         //Adaptamos valor a KWh/MWh:
         if(switchEnergia) { //MWh
             float division = Float.parseFloat(item.getPrice());
-            price.setText(formato2d.format(division) + magnitud);
+            price.setText(formato2d.format(division) + magnitudMwh);
             if(item.isCheap())
                 priceColor.setImageResource(R.drawable.mood_green);
             else
@@ -69,7 +70,7 @@ public class PricesAdapter extends ArrayAdapter<PreciosJSON> {
         }
         else { //KWh
             float division = Float.parseFloat(item.getPrice())/1000.0f;
-            price.setText(formato2d.format(division) + magnitud);
+            price.setText(formato2d.format(division) + magnitudKwh);
             if(item.isCheap())
                 priceColor.setImageResource(R.drawable.mood_green);
             else

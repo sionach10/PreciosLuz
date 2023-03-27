@@ -43,6 +43,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import dmax.dialog.SpotsDialog;
+
 
 public class PricesFragment extends Fragment {
     public PricesFragment() {
@@ -58,6 +60,7 @@ public class PricesFragment extends Fragment {
     PricesAdapter mAdapter;
     ImageButton btnCalendar;
     SwitchMaterial switchEnergia;
+    SpotsDialog mDialog; //Cargando
 
 
     private final Calendar mCalendar = Calendar.getInstance();
@@ -81,6 +84,48 @@ public class PricesFragment extends Fragment {
         fecha = mView.findViewById(R.id.date);
         btnCalendar = mView.findViewById(R.id.btnCalendar);
         switchEnergia = mView.findViewById(R.id.switchEnergia);
+        mDialog = new SpotsDialog(getContext());
+
+        //Inicializamos las fechas de hoy y mañana por defecto.
+        try {
+            fechasDefault = obtenerFechasFromDatePicker(day, month+1, year);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return mView;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        mDialog.show();
+        mDialog.setMessage("Cargando");
+
+        leerWSESIOS(fechasDefault);
+
+        btnCalendar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int _year, int _month, int _dayOfMonth) {
+                        try {
+                            fechasBusqueda = obtenerFechasFromDatePicker(_dayOfMonth, _month+1, _year);//El datePicker usa los meses de 0 a 11.
+
+                            leerWSESIOS(fechasBusqueda);
+
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, year, month, day); //Variables para inicializar el calendario en el día de hoy.
+                datePickerDialog.show();
+            }
+        });
 
         switchEnergia.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -107,44 +152,6 @@ public class PricesFragment extends Fragment {
                     //Cargamos los datos del adapter a la vista.
                     listaItemsPrecios.setAdapter(mAdapter);
                 }
-            }
-        });
-
-        //Inicializamos las fechas de hoy y mañana por defecto.
-        try {
-            fechasDefault = obtenerFechasFromDatePicker(day, month+1, year);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        return mView;
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        leerWSESIOS(fechasDefault);
-
-        btnCalendar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int _year, int _month, int _dayOfMonth) {
-                        try {
-                            fechasBusqueda = obtenerFechasFromDatePicker(_dayOfMonth, _month+1, _year);//El datePicker usa los meses de 0 a 11.
-
-                            leerWSESIOS(fechasBusqueda);
-
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, year, month, day); //Variables para inicializar el calendario en el día de hoy.
-                datePickerDialog.show();
             }
         });
     }
@@ -184,7 +191,8 @@ public class PricesFragment extends Fragment {
                     //Lo parseamos a un objeto del tipo PreciosJSON.
                     PreciosJSON[] preciosJSON = JsonPricesParser.obtenerJsonHoras(jsonObject, _fechasBusqueda);
 
-                    //Añadimos los preciosJSON a una lista.
+                    //Añadimos los preciosJSON a una lista, previamente borrada.
+                    mList.clear();
                     mList.addAll(Arrays.asList(preciosJSON));
 
                     //Modificamos campo fecha.
@@ -202,6 +210,7 @@ public class PricesFragment extends Fragment {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                mDialog.dismiss();
             }
         }, new Response.ErrorListener() {
             @Override
