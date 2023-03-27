@@ -99,24 +99,11 @@ public class UserProfileActivity extends AppCompatActivity {
             mFavChat.setVisibility(View.GONE); //setEnable también serviría.
         }
 
-        mFavChat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToChatActivity();
-            }
-        });
 
         getUser();
         getPostNumber();
         checkIfExistPost();
 
-    }
-
-    private void goToChatActivity() {
-        Intent intent = new Intent(UserProfileActivity.this, ChatActivity.class);
-        intent.putExtra("idUser1", mAuthProvider.getUid());
-        intent.putExtra("idUser2", mExtraIdUser);
-        startActivity(intent);
     }
 
     @Override

@@ -17,7 +17,6 @@ import androidx.core.app.Person;
 import androidx.core.graphics.drawable.IconCompat;
 
 import com.precioLuz.R;
-import com.precioLuz.activities.ChatActivity;
 import com.precioLuz.activities.HomeActivity;
 import com.precioLuz.models.Message;
 
@@ -59,7 +58,7 @@ public class NotificationHelper extends ContextWrapper {
     public NotificationCompat.Builder getNotification(String title, String body) {
 
         //Cuando pulsamos clic en la notificación nos lleva a la pantalla de HomeActivity.
-        Intent intent = new Intent(this, ChatActivity.class);
+        Intent intent = new Intent(this, HomeActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 

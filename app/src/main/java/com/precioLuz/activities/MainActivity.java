@@ -136,24 +136,6 @@ public class MainActivity extends AppCompatActivity {
                     }
             );
 
-/* Funcion que va con startActivityForResult que está deprecada.
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        //Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if(requestCode == REQUEST_CODE_GOOGLE) {
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            try {
-                //Google Sign in was successful, authenticate with firebase.
-                GoogleSignInAccount account = task.getResult(ApiException.class);
-                firebaseAuthWithGoogle(account);
-            }catch(ApiException e) {
-                Log.w("Error","Google Sign in failed.", e);
-                // ...
-            }
-        }
-    }
-*/
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         mDialog.show();
         mDialog.setMessage("Cargando");

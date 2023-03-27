@@ -1,7 +1,6 @@
 package com.precioLuz.adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +20,6 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.precioLuz.R;
-import com.precioLuz.activities.PostDetailActivity;
 import com.precioLuz.models.Like;
 import com.precioLuz.models.Post;
 import com.precioLuz.providers.AuthProvider;
@@ -79,14 +77,6 @@ public class PostsAdapter extends FirestoreRecyclerAdapter<Post, PostsAdapter.Vi
                 Picasso.with(context).load(post.getImage1()).into(holder.imageViewPost); //Para traer una URL necesitamos la libreria Picasso.
             }
         }
-        holder.viewHolder.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, PostDetailActivity.class);//Origen y destino.
-                intent.putExtra("id", postId);
-                context.startActivity(intent);
-            }
-        });
 
         holder.imageViewLike.setOnClickListener(new View.OnClickListener() {
             @Override

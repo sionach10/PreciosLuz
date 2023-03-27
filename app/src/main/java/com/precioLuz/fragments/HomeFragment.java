@@ -19,7 +19,6 @@ import com.google.firebase.firestore.Query;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.precioLuz.R;
 import com.precioLuz.activities.MainActivity;
-import com.precioLuz.activities.PostActivity;
 import com.precioLuz.adapters.PostsAdapter;
 import com.precioLuz.models.Post;
 import com.precioLuz.providers.AuthProvider;
@@ -69,13 +68,6 @@ public class HomeFragment extends Fragment implements MaterialSearchBar.OnSearch
                     logout();
                 }
                 return true;
-            }
-        });
-
-        mFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                goToPost();
             }
         });
         return mView;
@@ -130,14 +122,6 @@ public class HomeFragment extends Fragment implements MaterialSearchBar.OnSearch
         if(mPostAdapter.getListener()!= null) {
             mPostAdapter.getListener().remove();
         }
-    }
-
-    private void goToPost() {
-        // Vamos de un fragment a un activity, por eso el metodo intent cambia respecto al que
-        // teníamos en los activities.
-        Intent intent = new Intent(getContext(), PostActivity.class);
-        startActivity(intent);
-
     }
 
     private void logout() {

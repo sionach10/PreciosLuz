@@ -40,12 +40,6 @@ public class HomeActivity extends AppCompatActivity {
                 case R.id.itemFilters:
                     openFragment(new FiltersFragment());
                     return true;
-                case R.id.itemChat:
-                    openFragment(new ChatsFragment());
-                    return true;
-                case R.id.itemProfile:
-                    openFragment(new ProfileFragment());
-                    return true;
             }
 
             return true;

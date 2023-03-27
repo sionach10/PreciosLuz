@@ -22,18 +22,7 @@
         android:theme="@style/Theme.SocialTravel"
         tools:targetApi="31">
         <activity
-            android:name="com.precioLuz.activities.ChatActivity"
-            android:exported="false" />
-        <activity
             android:name="com.precioLuz.activities.FiltersActivity"
-            android:exported="false"
-            android:parentActivityName="com.precioLuz.activities.HomeActivity" />
-        <activity
-            android:name="com.precioLuz.activities.UserProfileActivity"
-            android:exported="false"
-            android:parentActivityName="com.precioLuz.activities.PostDetailActivity" />
-        <activity
-            android:name="com.precioLuz.activities.PostDetailActivity"
             android:exported="false"
             android:parentActivityName="com.precioLuz.activities.HomeActivity" />
         <activity
@@ -49,10 +38,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
-        <activity
-            android:name="com.precioLuz.activities.PostActivity"
-            android:exported="false" />
         <activity
             android:name="com.precioLuz.activities.CompleteProfileActivity"
             android:exported="false" />
