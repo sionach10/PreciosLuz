@@ -36,18 +36,8 @@ public class UserProvider {
 
     public Task<Void> update (User user) {
         Map<String, Object> map = new HashMap<>();
-        map.put( "username", user.getUsername());
-        map.put( "phone", user.getPhone());
+        map.put( "notifications", user.isNotifications());
         map.put( "timestamp", new Date().getTime());
-        map.put( "imageProfile", user.getImageProfile());
-        map.put( "imageCover", user.getImageCover());
         return mCollection.document(user.getId()).update(map);
-    }
-
-    public Task<Void> updateOnline (String idUser, boolean status) {
-        Map<String, Object> map = new HashMap<>();
-        map.put( "online", status);
-        map.put( "lastConnect", new Date().getTime());
-        return mCollection.document(idUser).update(map);
     }
 }

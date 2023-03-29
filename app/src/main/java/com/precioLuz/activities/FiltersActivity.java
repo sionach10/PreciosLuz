@@ -17,7 +17,6 @@ import com.precioLuz.adapters.PostsAdapter;
 import com.precioLuz.models.Post;
 import com.precioLuz.providers.AuthProvider;
 import com.precioLuz.providers.PostProvider;
-import com.precioLuz.utils.ViewedMessageHelper;
 
 public class FiltersActivity extends AppCompatActivity {
 
@@ -63,13 +62,11 @@ public class FiltersActivity extends AppCompatActivity {
         mPostAdapter = new PostsAdapter(options, FiltersActivity.this, mTextViewNumberFilter);
         mRecyclerView.setAdapter(mPostAdapter);
         mPostAdapter.startListening();
-        ViewedMessageHelper.updateOnline(true, FiltersActivity.this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        ViewedMessageHelper.updateOnline(false, FiltersActivity.this);
     }
 
     @Override

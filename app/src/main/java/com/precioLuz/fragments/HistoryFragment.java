@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import com.precioLuz.R;
 import com.precioLuz.activities.FiltersActivity;
 
-public class FiltersFragment extends Fragment {
+public class HistoryFragment extends Fragment {
 
     View mView;
     CardView mCardViewPS4;
@@ -25,7 +25,7 @@ public class FiltersFragment extends Fragment {
 
     Toolbar mToolbar;
 
-    public FiltersFragment() {
+    public HistoryFragment() {
         // Required empty public constructor
     }
 
@@ -33,7 +33,7 @@ public class FiltersFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        mView = inflater.inflate(R.layout.fragment_filters, container, false);
+        mView = inflater.inflate(R.layout.fragment_history, container, false);
 
         mCardViewPS4 = mView.findViewById(R.id.cardViewPs4);
         mCardViewXbox = mView.findViewById(R.id.cardViewXbox);

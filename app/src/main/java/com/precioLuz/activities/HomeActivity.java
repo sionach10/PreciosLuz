@@ -8,16 +8,12 @@ import android.os.Bundle;
 
 import com.precioLuz.R;
 import com.precioLuz.databinding.ActivityHomeBinding;
-import com.precioLuz.databinding.ActivityMainBinding;
-import com.precioLuz.fragments.ChatsFragment;
-import com.precioLuz.fragments.FiltersFragment;
-import com.precioLuz.fragments.HomeFragment;
+import com.precioLuz.fragments.HistoryFragment;
 import com.precioLuz.fragments.PricesFragment;
-import com.precioLuz.fragments.ProfileFragment;
+import com.precioLuz.fragments.SettingsFragment;
 import com.precioLuz.providers.AuthProvider;
 import com.precioLuz.providers.TokenProvider;
 import com.precioLuz.providers.UserProvider;
-import com.precioLuz.utils.ViewedMessageHelper;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -37,8 +33,11 @@ public class HomeActivity extends AppCompatActivity {
                 case R.id.itemHome:
                     openFragment(new PricesFragment());
                     return true;
-                case R.id.itemFilters:
-                    openFragment(new FiltersFragment());
+                case R.id.itemHistory:
+                    openFragment(new HistoryFragment());
+                    return true;
+                case R.id.itemSettings:
+                    openFragment(new SettingsFragment());
                     return true;
             }
 
@@ -56,13 +55,11 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onStart() { //Metodos del ciclo de vida de la app.
         super.onStart();
-        ViewedMessageHelper.updateOnline(true, HomeActivity.this);//Controlador de si el usuario está online o no.
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        ViewedMessageHelper.updateOnline(false, HomeActivity.this);
     }
 
     public void openFragment(Fragment fragment) {

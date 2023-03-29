@@ -11,6 +11,8 @@
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_baseline_email_24.xml" value="0.274" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_baseline_person_24_color.xml" value="0.1" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_flecha_atras.xml" value="0.294" />
+        <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_home.xml" value="0.203" />
+        <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_notifications.xml" value="0.1375" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_person.xml" value="0.196" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/icono_borrar.xml" value="0.274" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/rounded_boton.xml" value="0.274" />
@@ -48,6 +50,7 @@
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/fragment_home.xml" value="0.18" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/fragment_prices.xml" value="0.25" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/fragment_profile.xml" value="0.22" />
+        <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/fragment_settings.xml" value="0.31351351351351353" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/item_lista.xml" value="0.31261261261261264" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/item_lista_precios.xml" value="0.25" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/list_item.xml" value="0.271875" />

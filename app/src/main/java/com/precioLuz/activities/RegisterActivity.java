@@ -28,11 +28,9 @@ import dmax.dialog.SpotsDialog;
 public class RegisterActivity extends AppCompatActivity {
 
     CircleImageView mCircleFlechaAtras;
-    TextInputEditText mTextInputUserName;
     TextInputEditText mTextInputEmail;
     TextInputEditText mTextInputPassword;
     TextInputEditText mTextInputPasswordConfirmation;
-    TextInputEditText mTextInputPhone;
     Button mButtonRegister;
     AuthProvider mAuthProvider;
     UserProvider mUserProvider;
@@ -44,11 +42,9 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         mCircleFlechaAtras = findViewById(R.id.circleImageBack);
-        mTextInputUserName = findViewById(R.id.textInputUserName);
         mTextInputEmail = findViewById(R.id.textInputEmail);
         mTextInputPassword = findViewById(R.id.textInputPassword);
         mTextInputPasswordConfirmation = findViewById(R.id.textInputPasswordConfirmation);
-        mTextInputPhone = findViewById(R.id.textInputPhone);
         mButtonRegister = findViewById(R.id.btnRegister);
         mAuthProvider = new AuthProvider();
         mUserProvider = new UserProvider();
@@ -71,17 +67,15 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void register(){
-        String username = mTextInputUserName.getText().toString();
         String email = mTextInputEmail.getText().toString();
         String password = mTextInputPassword.getText().toString();
         String passwordConfirmation = mTextInputPasswordConfirmation.getText().toString();
-        String phone = mTextInputPhone.getText().toString();
 
-        if(!username.isEmpty() && !email.isEmpty() && !password.isEmpty() && !passwordConfirmation.isEmpty() && !phone.isEmpty()){
+        if(!email.isEmpty() && !password.isEmpty() && !passwordConfirmation.isEmpty()){
             if(isEmailValid(email)){
                 if(password.equals(passwordConfirmation)){
                     if(password.length()>=8)
-                        createUser(username, email, password, phone);
+                        createUser(email, password);
                     else
                         Toast.makeText(this, "La contraseña debe ser al menos de 8 caracteres.", Toast.LENGTH_SHORT).show();
                 }
@@ -104,7 +98,7 @@ public class RegisterActivity extends AppCompatActivity {
         return matcher.matches();
     }
 
-    private void createUser(final String username, final String email, String password, final String phone){
+    private void createUser(final String email, String password){
         mDialog.show();
         mDialog.setMessage("Cargando");
         mAuthProvider.register(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -116,8 +110,6 @@ public class RegisterActivity extends AppCompatActivity {
                     User user = new User();
                     user.setId(id);
                     user.setEmail(email);
-                    user.setUsername(username);
-                    user.setPhone(phone);
                     user.setTimestamp(new Date().getTime());
 
                     mUserProvider.create(user).addOnCompleteListener(new OnCompleteListener<Void>() {
