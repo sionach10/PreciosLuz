@@ -53,7 +53,6 @@ public class PricesFragment extends Fragment {
 
     //Variables globales
     View mView;
-    Toolbar mToolbar;
     ListView listaItemsPrecios;
     TextView fecha;
     List<PreciosJSON> mList = new ArrayList<>();
@@ -79,7 +78,6 @@ public class PricesFragment extends Fragment {
         // Inflate the layout for this fragment
         setHasOptionsMenu(true);
         mView = inflater.inflate(R.layout.fragment_prices, container, false);
-        mToolbar = mView.findViewById(R.id.toolbar);
         listaItemsPrecios= mView.findViewById(R.id.listaItemsPrecios);
         fecha = mView.findViewById(R.id.date);
         btnCalendar = mView.findViewById(R.id.btnCalendar);

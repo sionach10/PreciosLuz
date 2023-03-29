@@ -25,6 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginLeft="150dp"
+            android:layout_marginRight="5dp"
             android:background="@color/design_default_color_primary"
             android:src="@drawable/ic_baseline_calendar_month_24" />
     </LinearLayout>

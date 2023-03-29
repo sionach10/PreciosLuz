@@ -11,7 +11,9 @@
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_baseline_email_24.xml" value="0.274" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_baseline_person_24_color.xml" value="0.1" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_flecha_atras.xml" value="0.294" />
+        <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_graph.xml" value="0.194" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_home.xml" value="0.203" />
+        <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_light.xml" value="0.2795" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_notifications.xml" value="0.1375" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/ic_person.xml" value="0.196" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/icono_borrar.xml" value="0.274" />
@@ -21,7 +23,7 @@
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/drawable/rounded_linear_layout_gray.xml" value="0.2735" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout-w1240dp/activity_login.xml" value="0.17302543507362783" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout-w936dp/activity_login.xml" value="0.201953125" />
-        <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/action_bar_toolbar.xml" value="0.14605263157894738" />
+        <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/action_bar_toolbar.xml" value="0.25" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/action_bar_toolbar_precios.xml" value="0.25" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/action_bar_toolbar_precis.xml" value="0.31351351351351353" />
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/layout/activity_chat.xml" value="0.22" />
