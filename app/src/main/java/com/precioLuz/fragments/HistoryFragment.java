@@ -41,8 +41,7 @@ public class HistoryFragment extends Fragment {
         mCardViewPC = mView.findViewById(R.id.cardViewPC);
         mToolbar = mView.findViewById(R.id.toolbar);
 
-        ((AppCompatActivity) getActivity()).setSupportActionBar(mToolbar);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Filtros");
+        mToolbar.setTitle("Historial");
 
         mCardViewPS4.setOnClickListener(new View.OnClickListener() {
             @Override

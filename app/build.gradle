@@ -33,13 +33,13 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.5.1'
-    implementation 'com.google.android.material:material:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'com.google.android.material:material:1.7.0'
-    implementation 'androidx.annotation:annotation:1.5.0'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
+    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'androidx.annotation:annotation:1.6.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
     implementation 'io.github.florent37:shapeofview:1.4.7'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation platform('com.google.firebase:firebase-bom:30.2.0')
@@ -57,7 +57,7 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-firestore:8.0.2'
     implementation 'com.github.d-max:spots-dialog:0.7@aar'
     implementation 'com.github.mancj:MaterialSearchBar:0.8.5'
-    implementation 'com.google.firebase:firebase-messaging:23.1.1'
+    implementation 'com.google.firebase:firebase-messaging:23.1.2'
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
     implementation 'com.squareup.retrofit2:converter-scalars:2.4.0'
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
