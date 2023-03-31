@@ -1,5 +1,6 @@
 package com.precioLuz.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,6 +23,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.precioLuz.R;
+import com.precioLuz.activities.MainActivity;
 import com.precioLuz.models.User;
 import com.precioLuz.providers.AuthProvider;
 import com.precioLuz.providers.PostProvider;
@@ -32,7 +34,6 @@ import dmax.dialog.SpotsDialog;
 public class SettingsFragment extends Fragment {
 
     View mView;
-    Toolbar mToolbar;
     SpotsDialog mDialog;
     SwitchMaterial switchNotificacion;
     boolean mNotification = false;
@@ -46,6 +47,33 @@ public class SettingsFragment extends Fragment {
         // Required empty public constructor
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
+        mAuthProvider = new AuthProvider();
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.main_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        switch (item.getItemId()){
+            case R.id.itemLogout:
+                mAuthProvider.logout();
+                Intent intent = new Intent(getContext(), MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK); //Limpiamos historial del botón atras.
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,10 +81,8 @@ public class SettingsFragment extends Fragment {
         // Inflate the layout for this fragment
         mView = inflater.inflate(R.layout.fragment_settings, container, false);
         mDialog = new SpotsDialog(getContext());
-        mToolbar = mView.findViewById(R.id.toolbar);
         switchNotificacion = mView.findViewById(R.id.switchNotifications);
         textViewNotification = mView.findViewById(R.id.textViewNotification);
-        mToolbar.setTitle("Ajustes");
 
 
         mUserProvider = new UserProvider();

@@ -1,10 +1,14 @@
 package com.precioLuz.fragments;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
@@ -27,8 +31,11 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.precioLuz.R;
+import com.precioLuz.activities.HomeActivity;
+import com.precioLuz.activities.MainActivity;
 import com.precioLuz.adapters.PricesAdapter;
 import com.precioLuz.models.PreciosJSON;
+import com.precioLuz.providers.AuthProvider;
 import com.precioLuz.utils.JsonPricesParser;
 
 import org.json.JSONException;
@@ -52,12 +59,12 @@ public class PricesFragment extends Fragment {
     }
 
     //Variables globales
+    AuthProvider mAuthProvider;
     View mView;
     ListView listaItemsPrecios;
     TextView fecha;
     List<PreciosJSON> mList = new ArrayList<>();
     PricesAdapter mAdapter;
-    ImageButton btnCalendar;
     SwitchMaterial switchEnergia;
     SpotsDialog mDialog; //Cargando
 
@@ -69,18 +76,58 @@ public class PricesFragment extends Fragment {
     String [] fechasBusqueda = new String[2];
     String [] fechasDefault = new String[2];
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
+        mAuthProvider = new AuthProvider();
+        super.onCreate(savedInstanceState);
+    }
 
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.main_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        switch (item.getItemId()){
+            case R.id.itemLogout:
+                mAuthProvider.logout();
+                Intent intent = new Intent(getContext(), MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK); //Limpiamos historial del botón atras.
+                startActivity(intent);
+                return true;
+            case R.id.itemCalendar:
+                DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int _year, int _month, int _dayOfMonth) {
+                        try {
+                            fechasBusqueda = obtenerFechasFromDatePicker(_dayOfMonth, _month+1, _year);//El datePicker usa los meses de 0 a 11.
+
+                            leerWSESIOS(fechasBusqueda);
+
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, startYear, startMonth, startDay); //Variables para inicializar el calendario en el día de hoy.+
+                datePickerDialog.getDatePicker().setMaxDate(mCalendar.getTimeInMillis());//bloqueamos que no hagan clic en fechas futuras.
+                datePickerDialog.show();
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         // Inflate the layout for this fragment
-        setHasOptionsMenu(true);
         mView = inflater.inflate(R.layout.fragment_prices, container, false);
         listaItemsPrecios= mView.findViewById(R.id.listaItemsPrecios);
         fecha = mView.findViewById(R.id.date);
-        btnCalendar = mView.findViewById(R.id.btnCalendar);
         switchEnergia = mView.findViewById(R.id.switchEnergia);
         mDialog = new SpotsDialog(getContext());
 
@@ -103,29 +150,6 @@ public class PricesFragment extends Fragment {
         mDialog.setMessage("Cargando");
 
         leerWSESIOS(fechasDefault);
-
-        btnCalendar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-
-                DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int _year, int _month, int _dayOfMonth) {
-                        try {
-                            fechasBusqueda = obtenerFechasFromDatePicker(_dayOfMonth, _month+1, _year);//El datePicker usa los meses de 0 a 11.
-
-                            leerWSESIOS(fechasBusqueda);
-
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, startYear, startMonth, startDay); //Variables para inicializar el calendario en el día de hoy.+
-                datePickerDialog.getDatePicker().setMaxDate(mCalendar.getTimeInMillis());//bloqueamos que no hagan clic en fechas futuras.
-                datePickerDialog.show();
-            }
-        });
 
         switchEnergia.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override

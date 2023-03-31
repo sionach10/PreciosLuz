@@ -6,8 +6,6 @@
     tools:context=".fragments.HistoryFragment"
     android:layout_marginBottom="65dp">
 
-    <include layout="@layout/action_bar_toolbar"/>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

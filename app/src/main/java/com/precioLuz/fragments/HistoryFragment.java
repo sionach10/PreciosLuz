@@ -3,30 +3,56 @@ package com.precioLuz.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.cardview.widget.CardView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.precioLuz.R;
-import com.precioLuz.activities.FiltersActivity;
+import com.precioLuz.activities.MainActivity;
+import com.precioLuz.providers.AuthProvider;
 
 public class HistoryFragment extends Fragment {
 
     View mView;
-    CardView mCardViewPS4;
-    CardView mCardViewXbox;
-    CardView mCardViewNintendo;
-    CardView mCardViewPC;
-
-    Toolbar mToolbar;
+    AuthProvider mAuthProvider;
 
     public HistoryFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
+        mAuthProvider = new AuthProvider();
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.main_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        switch (item.getItemId()){
+            case R.id.itemLogout:
+                mAuthProvider.logout();
+                Intent intent = new Intent(getContext(), MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK); //Limpiamos historial del botón atras.
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -34,46 +60,7 @@ public class HistoryFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         mView = inflater.inflate(R.layout.fragment_history, container, false);
-
-        mCardViewPS4 = mView.findViewById(R.id.cardViewPs4);
-        mCardViewXbox = mView.findViewById(R.id.cardViewXbox);
-        mCardViewNintendo = mView.findViewById(R.id.cardViewNintendo);
-        mCardViewPC = mView.findViewById(R.id.cardViewPC);
-        mToolbar = mView.findViewById(R.id.toolbar);
-
-        mToolbar.setTitle("Historial");
-
-        mCardViewPS4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToFilterActivity("PS4");
-            }
-        });
-        mCardViewXbox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToFilterActivity("XBOX");
-            }
-        });
-        mCardViewNintendo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToFilterActivity("NINTENDO");
-            }
-        });
-        mCardViewPC.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToFilterActivity("PC");
-            }
-        });
-
         return mView;
     }
 
-    private void goToFilterActivity(String category) {
-        Intent intent = new Intent(getContext(), FiltersActivity.class); //Aqui pasamos el contexto ya que nos encontramos en un fragment.
-        intent.putExtra("category", category);
-        startActivity(intent);
-    }
 }

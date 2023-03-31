@@ -21,10 +21,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SocialTravel"
         tools:targetApi="31">
-        <activity
-            android:name="com.precioLuz.activities.FiltersActivity"
-            android:exported="false"
-            android:parentActivityName="com.precioLuz.activities.HomeActivity" />
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.precioLuz"
