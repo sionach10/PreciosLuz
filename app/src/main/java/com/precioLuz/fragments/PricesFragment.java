@@ -137,7 +137,6 @@ public class PricesFragment extends Fragment {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
         return mView;
     }
 
