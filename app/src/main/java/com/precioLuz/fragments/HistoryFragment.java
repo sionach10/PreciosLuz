@@ -30,6 +30,7 @@ public class HistoryFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
+
         mAuthProvider = new AuthProvider();
         super.onCreate(savedInstanceState);
     }
@@ -37,6 +38,7 @@ public class HistoryFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.main_menu, menu);
+        menu.findItem(R.id.itemCalendar).setVisible(false);
         super.onCreateOptionsMenu(menu, inflater);
     }
 

@@ -57,6 +57,7 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.main_menu, menu);
+        menu.findItem(R.id.itemCalendar).setVisible(false);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
