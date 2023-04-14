@@ -1,6 +1,7 @@
 package com.precioLuz.models;
 
 public class PreciosJSON {
+    //Variables
     private String hour;
     private boolean isCheap;
     private boolean isUnderAvg;
@@ -8,13 +9,6 @@ public class PreciosJSON {
 
     //Constructor vacío.
     public PreciosJSON() {}
-
-    public PreciosJSON(String date, String hour, boolean isCheap, boolean isUnderAvg, String market, String price, String units) {
-        this.hour = hour;
-        this.isCheap = isCheap;
-        this.isUnderAvg = isUnderAvg;
-        this.price = price;
-    }
 
     public String getHour() {
         return hour;

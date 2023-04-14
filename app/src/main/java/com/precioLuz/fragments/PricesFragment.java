@@ -36,6 +36,7 @@ import com.precioLuz.activities.MainActivity;
 import com.precioLuz.adapters.PricesAdapter;
 import com.precioLuz.models.PreciosJSON;
 import com.precioLuz.providers.AuthProvider;
+import com.precioLuz.providers.CalendarDatePickerProvider;
 import com.precioLuz.utils.JsonPricesParser;
 
 import org.json.JSONException;
@@ -104,7 +105,10 @@ public class PricesFragment extends Fragment {
                     @Override
                     public void onDateSet(DatePicker view, int _year, int _month, int _dayOfMonth) {
                         try {
-                            fechasBusqueda = obtenerFechasFromDatePicker(_dayOfMonth, _month+1, _year);//El datePicker usa los meses de 0 a 11.
+                            fechasBusqueda = CalendarDatePickerProvider.obtenerFechasFromDatePicker(_dayOfMonth, _month+1, _year);//El datePicker usa los meses de 0 a 11.
+
+                            //Modificamos campo fecha.
+                            fecha.setText(fechasBusqueda[0]);
 
                             leerWSESIOS(fechasBusqueda);
 
@@ -133,7 +137,7 @@ public class PricesFragment extends Fragment {
 
         //Inicializamos las fechas de hoy y mañana por defecto.
         try {
-            fechasDefault = obtenerFechasFromDatePicker(startDay, startMonth+1, startYear);
+            fechasDefault = CalendarDatePickerProvider.obtenerFechasFromDatePicker(startDay, startMonth+1, startYear);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -179,29 +183,6 @@ public class PricesFragment extends Fragment {
         });
     }
 
-    private String[] obtenerFechasFromDatePicker(int dayOfMonth, int month, int year) throws ParseException {
-
-        String [] _fechasBusqueda = new String[2];
-
-        String _date = String.valueOf(dayOfMonth) + "/" + String.valueOf(month) + "/" + String.valueOf(year);
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-
-        Calendar calendar = Calendar.getInstance();
-        try{
-            calendar.setTime(sdf.parse(_date));
-            _date = sdf.format(calendar.getTime());
-        }
-        catch (ParseException e){
-            e.printStackTrace();
-        }
-        calendar.add(Calendar.DAY_OF_MONTH, 1);
-        String _dateNext = sdf.format(calendar.getTime());
-
-        _fechasBusqueda[0] = _date;
-        _fechasBusqueda[1] = _dateNext;
-        return _fechasBusqueda;
-    }
-
     private void leerWSESIOS(String [] _fechasBusqueda) {
 
         String url = "https://api.esios.ree.es/indicators/10391?geo_ids[]=8741&start_date="+_fechasBusqueda[0]+"&end_date="+_fechasBusqueda[1];
@@ -218,11 +199,8 @@ public class PricesFragment extends Fragment {
                     mList.clear();
                     mList.addAll(Arrays.asList(preciosJSON));
 
-                    //Modificamos campo fecha.
-                    fecha.setText(_fechasBusqueda[0]);
-
                     //Creamos el adaptador con los datos de la lista.
-                    mAdapter = new PricesAdapter(requireContext(),R.layout.item_lista_precios, mList, switchEnergia.isChecked()); //TODO
+                    mAdapter = new PricesAdapter(requireContext(),R.layout.item_lista_precios, mList, switchEnergia.isChecked());
 
                     //Vaciamos la lista al cambiar de día:
                     listaItemsPrecios.setAdapter(null);
