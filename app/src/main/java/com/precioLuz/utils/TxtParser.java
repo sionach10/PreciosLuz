@@ -28,8 +28,6 @@ public class TxtParser {
         EnergyByTechnology energyByTechnology = new EnergyByTechnology();
         String linea = "";
         Map<Integer, Float> carbon = new HashMap<>();
-        Map<Integer, Float> fuel_gas = new HashMap<>();
-        Map<Integer, Float> autoproductor = new HashMap<>();
         Map<Integer, Float> nuclear = new HashMap<>();
         Map<Integer, Float> hidraulica = new HashMap<>();
         Map<Integer, Float> ciclo_combinado = new HashMap<>();
@@ -55,8 +53,6 @@ public class TxtParser {
                     }
 
                     carbon.put(Integer.valueOf(campos[1]), Float.valueOf(campos[2]));
-                    fuel_gas.put(Integer.valueOf(campos[1]), Float.valueOf(campos[3]));
-                    autoproductor.put(Integer.valueOf(campos[1]), Float.valueOf(campos[4]));
                     nuclear.put(Integer.valueOf(campos[1]), Float.valueOf(campos[5]));
                     hidraulica.put(Integer.valueOf(campos[1]), Float.valueOf(campos[6]));
                     ciclo_combinado.put(Integer.valueOf(campos[1]), Float.valueOf(campos[7]));
@@ -68,8 +64,6 @@ public class TxtParser {
             }
 
             energyByTechnology.setCarbon(carbon);
-            energyByTechnology.setFuel_gas(fuel_gas);
-            energyByTechnology.setAutoproductor(autoproductor);
             energyByTechnology.setNuclear(nuclear);
             energyByTechnology.setHidraulica(hidraulica);
             energyByTechnology.setCiclo_combinado(ciclo_combinado);

@@ -6,8 +6,6 @@ import java.util.Map;
 public class EnergyByTechnology {
     //Variables
     Map<Integer, Float> carbon = new HashMap<>();
-    Map<Integer, Float> fuel_gas = new HashMap<>();
-    Map<Integer, Float> autoproductor = new HashMap<>();
     Map<Integer, Float> nuclear = new HashMap<>();
     Map<Integer, Float> hidraulica = new HashMap<>();
     Map<Integer, Float> ciclo_combinado = new HashMap<>();
@@ -15,7 +13,6 @@ public class EnergyByTechnology {
     Map<Integer, Float> solar_termica = new HashMap<>();
     Map<Integer, Float> solar_fotovoltaica = new HashMap<>();
     Map<Integer, Float> cogen = new HashMap<>();
-
 
     //Constructor vacio
     public EnergyByTechnology() {}
@@ -26,22 +23,6 @@ public class EnergyByTechnology {
 
     public void setCarbon(Map<Integer, Float> carbon) {
         this.carbon = carbon;
-    }
-
-    public Map<Integer, Float> getFuel_gas() {
-        return fuel_gas;
-    }
-
-    public void setFuel_gas(Map<Integer, Float> fuel_gas) {
-        this.fuel_gas = fuel_gas;
-    }
-
-    public Map<Integer, Float> getAutoproductor() {
-        return autoproductor;
-    }
-
-    public void setAutoproductor(Map<Integer, Float> autoproductor) {
-        this.autoproductor = autoproductor;
     }
 
     public Map<Integer, Float> getNuclear() {

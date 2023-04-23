@@ -15,4 +15,14 @@
     <color name="azul">#006BDD</color>
     <color name="verde">#0CB600</color>
 
+    <color name="carbon">#686868</color>
+    <color name="nuclear">#a4d9e7</color>
+    <color name="hidraulica">#00b3d0</color>
+    <color name="ciclo_combinado">#898989</color>
+    <color name="eolica">#028391</color>
+    <color name="solar_termica">#fbe097</color>
+    <color name="solar_fotovoltaica">#fdca44</color>
+    <color name="cogen">#8cc63f</color>
+
+
 </resources>

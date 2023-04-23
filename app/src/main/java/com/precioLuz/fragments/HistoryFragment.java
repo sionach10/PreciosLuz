@@ -23,27 +23,16 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.precioLuz.R;
 import com.precioLuz.activities.MainActivity;
-import com.precioLuz.adapters.PricesAdapter;
 import com.precioLuz.models.EnergyByTechnology;
-import com.precioLuz.models.PreciosJSON;
 import com.precioLuz.providers.AuthProvider;
 import com.precioLuz.providers.CalendarDatePickerProvider;
-import com.precioLuz.utils.JsonPricesParser;
+import com.precioLuz.utils.AreaChart;
 import com.precioLuz.utils.TxtParser;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -66,7 +55,6 @@ public class HistoryFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-
         mAuthProvider = new AuthProvider();
         super.onCreate(savedInstanceState);
     }
@@ -121,7 +109,6 @@ public class HistoryFragment extends Fragment {
 
     }
 
-
     private void leerTxtFromWeb(String [] _fechasBusqueda) throws IOException {
 
         //Replace format
@@ -137,6 +124,8 @@ public class HistoryFragment extends Fragment {
                 try {
                     EnergyByTechnology energyByTechnology = TxtParser.obtenerSeriesPorTecnologia(response);
                     //Todo: Pintar la grafica con los datos de energyByTechnlogy.
+                    //Gráfico:
+                    AreaChart.crearGrafico(mView, energyByTechnology);
 
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -157,5 +146,4 @@ public class HistoryFragment extends Fragment {
         };
         Volley.newRequestQueue(requireContext()).add(getRequest);
     }
-
 }
