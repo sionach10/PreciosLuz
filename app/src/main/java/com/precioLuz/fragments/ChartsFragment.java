@@ -1,11 +1,14 @@
 package com.precioLuz.fragments;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +17,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.DatePicker;
+import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -21,14 +27,16 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.precioLuz.R;
+import com.precioLuz.activities.HomeActivity;
 import com.precioLuz.activities.MainActivity;
+import com.precioLuz.adapters.PricesAdapter;
 import com.precioLuz.models.EnergyByTechnology;
 import com.precioLuz.providers.AuthProvider;
 import com.precioLuz.providers.CalendarDatePickerProvider;
 import com.precioLuz.utils.AreaChart;
 import com.precioLuz.utils.TxtParser;
-
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -37,7 +45,9 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HistoryFragment extends Fragment {
+import dmax.dialog.SpotsDialog;
+
+public class ChartsFragment extends Fragment {
 
     View mView;
     AuthProvider mAuthProvider;
@@ -45,10 +55,14 @@ public class HistoryFragment extends Fragment {
     private final int startDay = mCalendar.get(Calendar.DAY_OF_MONTH);
     private final int startMonth = mCalendar.get(Calendar.MONTH); //Los meses los devuelve de 0 a 11.
     private final int startYear = mCalendar.get(Calendar.YEAR);
+    TextView fecha;
+    SwitchMaterial switchCharts;
     String [] fechasBusqueda = new String[2];
     String [] fechasDefault = new String[2];
+    SpotsDialog mDialog; //Cargando
 
-    public HistoryFragment() {
+
+    public ChartsFragment() {
         // Required empty public constructor
     }
 
@@ -62,7 +76,7 @@ public class HistoryFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.main_menu, menu);
-        menu.findItem(R.id.itemCalendar).setVisible(false);
+        this.getActivity().setTitle("Energía por tecnología");
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -76,6 +90,25 @@ public class HistoryFragment extends Fragment {
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK); //Limpiamos historial del botón atras.
                 startActivity(intent);
                 return true;
+            case R.id.itemCalendar:
+                DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int _year, int _month, int _dayOfMonth) {
+                        try {
+                            fechasBusqueda = CalendarDatePickerProvider.obtenerFechasFromDatePicker(_dayOfMonth, _month+1, _year);//El datePicker usa los meses de 0 a 11.
+
+                            //Modificamos campo fecha.
+                            fecha.setText(fechasBusqueda[0]);
+
+                            leerTxtFromWeb(fechasBusqueda);
+
+                        } catch (ParseException | IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, startYear, startMonth, startDay); //Variables para inicializar el calendario en el día de hoy.+
+                datePickerDialog.getDatePicker().setMaxDate(mCalendar.getTimeInMillis());//bloqueamos que no hagan clic en fechas futuras.
+                datePickerDialog.show();
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -85,7 +118,10 @@ public class HistoryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        mView = inflater.inflate(R.layout.fragment_history, container, false);
+        mView = inflater.inflate(R.layout.fragment_charts, container, false);
+        mDialog = new SpotsDialog(getContext());
+        fecha = mView.findViewById(R.id.dateCharts);
+        switchCharts = mView.findViewById(R.id.switchCharts);
 
         //Inicializamos las fechas de hoy y mañana por defecto.
         try {
@@ -93,21 +129,39 @@ public class HistoryFragment extends Fragment {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
         return mView;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        mDialog.show();
+        mDialog.setMessage("Cargando");
         try {
+            fecha.setText(fechasDefault[0]);
             leerTxtFromWeb(fechasDefault);
+            mDialog.dismiss();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+        switchCharts.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked) {
+                    openFragment(new PieChartFragment());
+                }
+            }
+        });
     }
+
+    private void openFragment(Fragment fragment) {
+        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+        transaction.replace(R.id.container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
 
     private void leerTxtFromWeb(String [] _fechasBusqueda) throws IOException {
 
@@ -123,7 +177,6 @@ public class HistoryFragment extends Fragment {
                 //Lo parseamos a un objeto del tipo EnergyByTechnology.
                 try {
                     EnergyByTechnology energyByTechnology = TxtParser.obtenerSeriesPorTecnologia(response);
-                    //Todo: Pintar la grafica con los datos de energyByTechnlogy.
                     //Gráfico:
                     AreaChart.crearGrafico(mView, energyByTechnology);
 

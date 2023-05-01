@@ -31,7 +31,7 @@ public class AreaChart {
     public static void crearGrafico(View mView, EnergyByTechnology datos) {
 
         // in this example, a LineChart is initialized from xml
-        LineChart chart = mView.findViewById(R.id.chart);
+        LineChart chart = mView.findViewById(R.id.lineChart);
         final int fillColorCarbon = ContextCompat.getColor(chart.getContext(), R.color.carbon);
         chart.setBackgroundColor(Color.WHITE);
         chart.setGridBackgroundColor(fillColorCarbon);
@@ -40,10 +40,6 @@ public class AreaChart {
 
         //Opciones del grafico:
         configurarEjesChart(chart);
-
-
-
-
 
         // use the interface ILineDataSet
         List<ILineDataSet> dataSets = new ArrayList<ILineDataSet>();
@@ -124,6 +120,7 @@ public class AreaChart {
         dataSet1.setColor(ContextCompat.getColor(chart.getContext(), R.color.nuclear));
         dataSet1.setDrawCircles(false);
         dataSet1.setLineWidth(2f);
+        dataSet1.setCircleRadius(3f);
         dataSet1.setCircleRadius(3f);
         dataSet1.setFillAlpha(255);
         dataSet1.setDrawFilled(true);

@@ -58,6 +58,7 @@ public class SettingsFragment extends Fragment {
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.main_menu, menu);
         menu.findItem(R.id.itemCalendar).setVisible(false);
+        this.getActivity().setTitle("Ajustes");
         super.onCreateOptionsMenu(menu, inflater);
     }
 

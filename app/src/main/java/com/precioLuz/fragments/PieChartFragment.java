@@ -4,6 +4,13 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -13,15 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
-import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -31,51 +30,40 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.precioLuz.R;
-import com.precioLuz.activities.HomeActivity;
 import com.precioLuz.activities.MainActivity;
-import com.precioLuz.adapters.PricesAdapter;
-import com.precioLuz.models.PreciosJSON;
+import com.precioLuz.models.EnergyByTechnology;
 import com.precioLuz.providers.AuthProvider;
 import com.precioLuz.providers.CalendarDatePickerProvider;
-import com.precioLuz.utils.JsonPricesParser;
+import com.precioLuz.utils.PieChartUtility;
+import com.precioLuz.utils.TxtParser;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import dmax.dialog.SpotsDialog;
 
+public class PieChartFragment extends Fragment {
 
-public class PricesFragment extends Fragment {
-    public PricesFragment() {
-        //Required empty public constructor
-    }
-
-    //Variables globales
-    AuthProvider mAuthProvider;
     View mView;
-    ListView listaItemsPrecios;
-    TextView fecha;
-    List<PreciosJSON> mList = new ArrayList<>();
-    PricesAdapter mAdapter;
-    SwitchMaterial switchEnergia;
-    SpotsDialog mDialog; //Cargando
-
-
+    AuthProvider mAuthProvider;
     private final Calendar mCalendar = Calendar.getInstance();
     private final int startDay = mCalendar.get(Calendar.DAY_OF_MONTH);
     private final int startMonth = mCalendar.get(Calendar.MONTH); //Los meses los devuelve de 0 a 11.
     private final int startYear = mCalendar.get(Calendar.YEAR);
+    TextView fecha;
+    SwitchMaterial switchPieCharts;
     String [] fechasBusqueda = new String[2];
     String [] fechasDefault = new String[2];
+    SpotsDialog mDialog; //Cargando
+
+
+    public PieChartFragment() {
+        // Required empty public constructor
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -87,7 +75,7 @@ public class PricesFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.main_menu, menu);
-        this.getActivity().setTitle("Precios horarios PVPC");
+        this.getActivity().setTitle("Distribución por tecnología");
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -111,9 +99,9 @@ public class PricesFragment extends Fragment {
                             //Modificamos campo fecha.
                             fecha.setText(fechasBusqueda[0]);
 
-                            leerWSESIOS(fechasBusqueda);
+                            leerTxtFromWeb(fechasBusqueda);
 
-                        } catch (ParseException e) {
+                        } catch (ParseException | IOException e) {
                             e.printStackTrace();
                         }
                     }
@@ -128,13 +116,13 @@ public class PricesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         // Inflate the layout for this fragment
-        mView = inflater.inflate(R.layout.fragment_prices, container, false);
-        listaItemsPrecios= mView.findViewById(R.id.listaItemsPrecios);
-        fecha = mView.findViewById(R.id.date);
-        switchEnergia = mView.findViewById(R.id.switchEnergia);
+        mView = inflater.inflate(R.layout.fragment_pie_chart, container, false);
         mDialog = new SpotsDialog(getContext());
+        fecha = mView.findViewById(R.id.datePieCharts);
+        switchPieCharts = mView.findViewById(R.id.switchPieCharts);
+
+        switchPieCharts.setChecked(true);
 
         //Inicializamos las fechas de hoy y mañana por defecto.
         try {
@@ -145,75 +133,58 @@ public class PricesFragment extends Fragment {
         return mView;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         mDialog.show();
         mDialog.setMessage("Cargando");
+        try {
+            fecha.setText(fechasDefault[0]);
+            leerTxtFromWeb(fechasDefault);
+            mDialog.dismiss();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        fecha.setText(fechasDefault[0]);
-        leerWSESIOS(fechasDefault);
-
-        switchEnergia.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        switchPieCharts.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked) {
-                    switchEnergia.setText("MWh");
-                    //Creamos el adaptador con los datos de la lista.
-                    mAdapter = new PricesAdapter(requireContext(),R.layout.item_lista_precios, mList, isChecked); //TODO
-
-                    //Vaciamos la lista al cambiar de día:
-                    listaItemsPrecios.setAdapter(null);
-
-                    //Cargamos los datos del adapter a la vista.
-                    listaItemsPrecios.setAdapter(mAdapter);
-                }
-                else{
-                    switchEnergia.setText("KWh");
-                    //Creamos el adaptador con los datos de la lista.
-                    mAdapter = new PricesAdapter(requireContext(),R.layout.item_lista_precios, mList, isChecked); //TODO
-
-                    //Vaciamos la lista al cambiar de día:
-                    listaItemsPrecios.setAdapter(null);
-
-                    //Cargamos los datos del adapter a la vista.
-                    listaItemsPrecios.setAdapter(mAdapter);
+                if(!isChecked) {
+                    openFragment(new ChartsFragment());
                 }
             }
         });
     }
 
-    private void leerWSESIOS(String [] _fechasBusqueda) {
+    private void openFragment(Fragment fragment) {
+        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+        transaction.replace(R.id.container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
 
-        String url = "https://api.esios.ree.es/indicators/10391?geo_ids[]=8741&start_date="+_fechasBusqueda[0]+"&end_date="+_fechasBusqueda[1];
+    private void leerTxtFromWeb(String [] _fechasBusqueda) throws IOException {
+
+        //Replace format
+        String fecha = _fechasBusqueda[0].replace("/", "_");
+
+        String url = "https://www.omie.es/sites/default/files/dados/AGNO_"+fecha.substring(6,10)+"/MES_"+fecha.substring(3,5)+"/TXT/INT_PBC_TECNOLOGIAS_H_9_"+fecha+"_"+fecha+".TXT";
+
         StringRequest getRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onResponse(String response) {
+
+                //Lo parseamos a un objeto del tipo EnergyByTechnology.
                 try {
-                    JSONObject jsonObject = new JSONObject(response);//Recibimos el JSON.
+                    EnergyByTechnology energyByTechnology = TxtParser.obtenerSeriesPorTecnologia(response);
+                    //Gráfico:
+                    PieChartUtility.crearGrafico(mView, energyByTechnology);
 
-                    //Lo parseamos a un objeto del tipo PreciosJSON.
-                    PreciosJSON[] preciosJSON = JsonPricesParser.obtenerJsonHoras(jsonObject, _fechasBusqueda);
-
-                    //Añadimos los preciosJSON a una lista, previamente borrada.
-                    mList.clear();
-                    mList.addAll(Arrays.asList(preciosJSON));
-
-                    //Creamos el adaptador con los datos de la lista.
-                    mAdapter = new PricesAdapter(requireContext(),R.layout.item_lista_precios, mList, switchEnergia.isChecked());
-
-                    //Vaciamos la lista al cambiar de día:
-                    listaItemsPrecios.setAdapter(null);
-
-                    //Cargamos los datos del adapter a la vista.
-                    listaItemsPrecios.setAdapter(mAdapter);
-
-                } catch (JSONException e) {
+                } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
-                mDialog.dismiss();
             }
         }, new Response.ErrorListener() {
             @Override
