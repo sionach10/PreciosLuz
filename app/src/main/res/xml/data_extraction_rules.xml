@@ -5,8 +5,7 @@
 -->
 <data-extraction-rules>
     <cloud-backup>
-        <!-- TODO: - Cerrar sesión da crash.
-                   - La búsqueda no funciona bien. PostProvider revisar query.
+        <!--
         <include .../>
         <exclude .../>
         -->

@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentResultListener;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
@@ -52,13 +53,14 @@ public class ChartsFragment extends Fragment {
     View mView;
     AuthProvider mAuthProvider;
     private final Calendar mCalendar = Calendar.getInstance();
-    private final int startDay = mCalendar.get(Calendar.DAY_OF_MONTH);
-    private final int startMonth = mCalendar.get(Calendar.MONTH); //Los meses los devuelve de 0 a 11.
-    private final int startYear = mCalendar.get(Calendar.YEAR);
+    private int startDay = mCalendar.get(Calendar.DAY_OF_MONTH);
+    private int startMonth = mCalendar.get(Calendar.MONTH); //Los meses los devuelve de 0 a 11.
+    private int startYear = mCalendar.get(Calendar.YEAR);
     TextView fecha;
     SwitchMaterial switchCharts;
     String [] fechasBusqueda = new String[2];
     String [] fechasDefault = new String[2];
+    String [] fechaBusqueda_recibida = new String[2];
     SpotsDialog mDialog; //Cargando
 
 
@@ -137,11 +139,21 @@ public class ChartsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         mDialog.show();
         mDialog.setMessage("Cargando");
+
         try {
+            if(fechaBusqueda_recibida[0] != null) {
+                startDay = Integer.parseInt(fechaBusqueda_recibida[0].substring(0,2));
+                startMonth = Integer.parseInt(fechaBusqueda_recibida[0].substring(3,5))-1; //Ya que van de 0 a 11.
+                startYear = Integer.parseInt(fechaBusqueda_recibida[0].substring(6,10));
+            }
+
+            fechasDefault = CalendarDatePickerProvider.obtenerFechasFromDatePicker(startDay, startMonth+1, startYear);
+
             fecha.setText(fechasDefault[0]);
             leerTxtFromWeb(fechasDefault);
             mDialog.dismiss();
-        } catch (IOException e) {
+
+        } catch (ParseException | IOException e) {
             e.printStackTrace();
         }
 
@@ -157,6 +169,10 @@ public class ChartsFragment extends Fragment {
 
     private void openFragment(Fragment fragment) {
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+        //Parametros que enviamos de un fragment a otro.
+        Bundle bundle = new Bundle();
+        bundle.putString("fechaBusqueda", fechasBusqueda[0]);
+        getParentFragmentManager().setFragmentResult("key", bundle);
         transaction.replace(R.id.container, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
