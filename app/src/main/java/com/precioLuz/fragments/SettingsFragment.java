@@ -2,7 +2,6 @@ package com.precioLuz.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -10,11 +9,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -26,7 +23,6 @@ import com.precioLuz.R;
 import com.precioLuz.activities.MainActivity;
 import com.precioLuz.models.User;
 import com.precioLuz.providers.AuthProvider;
-import com.precioLuz.providers.PostProvider;
 import com.precioLuz.providers.UserProvider;
 
 import dmax.dialog.SpotsDialog;
@@ -41,7 +37,6 @@ public class SettingsFragment extends Fragment {
 
     UserProvider mUserProvider;
     AuthProvider mAuthProvider;
-    PostProvider mPostProvider;
 
     public SettingsFragment() {
         // Required empty public constructor
@@ -89,7 +84,6 @@ public class SettingsFragment extends Fragment {
 
         mUserProvider = new UserProvider();
         mAuthProvider = new AuthProvider();
-        mPostProvider = new PostProvider();
 
         textViewNotification.setVisibility(View.GONE);
         switchNotificacion.setVisibility(View.GONE); //Para esperar a que cargue el valor de BBDD
