@@ -2,14 +2,13 @@ package com.precioLuz.fragments;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentResultListener;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,13 +29,12 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.precioLuz.R;
-import com.precioLuz.activities.HomeActivity;
 import com.precioLuz.activities.MainActivity;
-import com.precioLuz.adapters.PricesAdapter;
 import com.precioLuz.models.EnergyByTechnology;
 import com.precioLuz.providers.AuthProvider;
 import com.precioLuz.providers.CalendarDatePickerProvider;
 import com.precioLuz.utils.AreaChart;
+import com.precioLuz.utils.PieChartUtility;
 import com.precioLuz.utils.TxtParser;
 
 import java.io.FileNotFoundException;
@@ -58,10 +56,12 @@ public class ChartsFragment extends Fragment {
     private int startYear = mCalendar.get(Calendar.YEAR);
     TextView fecha;
     SwitchMaterial switchCharts;
+    boolean switchIsChecked;
     String [] fechasBusqueda = new String[2];
     String [] fechasDefault = new String[2];
     String [] fechaBusqueda_recibida = new String[2];
     SpotsDialog mDialog; //Cargando
+    EnergyByTechnology energyByTechnology;
 
 
     public ChartsFragment() {
@@ -101,7 +101,6 @@ public class ChartsFragment extends Fragment {
 
                             //Modificamos campo fecha.
                             fecha.setText(fechasBusqueda[0]);
-
                             leerTxtFromWeb(fechasBusqueda);
 
                         } catch (ParseException | IOException e) {
@@ -124,6 +123,7 @@ public class ChartsFragment extends Fragment {
         mDialog = new SpotsDialog(getContext());
         fecha = mView.findViewById(R.id.dateCharts);
         switchCharts = mView.findViewById(R.id.switchCharts);
+        switchCharts.setChecked(false);
 
         //Inicializamos las fechas de hoy y mañana por defecto.
         try {
@@ -158,28 +158,22 @@ public class ChartsFragment extends Fragment {
         }
 
         switchCharts.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked) {
-                    openFragment(new PieChartFragment());
+                    switchIsChecked = true;
+                    PieChartUtility.crearGrafico(mView, energyByTechnology);
+                }
+                else {
+                    switchIsChecked = false;
+                    AreaChart.crearGrafico(mView, energyByTechnology);
                 }
             }
         });
     }
 
-    private void openFragment(Fragment fragment) {
-        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-        //Parametros que enviamos de un fragment a otro.
-        Bundle bundle = new Bundle();
-        bundle.putString("fechaBusqueda", fechasBusqueda[0]);
-        getParentFragmentManager().setFragmentResult("key", bundle);
-        transaction.replace(R.id.container, fragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
-    }
-
-
-    private void leerTxtFromWeb(String [] _fechasBusqueda) throws IOException {
+    public void leerTxtFromWeb(String [] _fechasBusqueda) throws IOException {
 
         //Replace format
         String fecha = _fechasBusqueda[0].replace("/", "_");
@@ -187,14 +181,20 @@ public class ChartsFragment extends Fragment {
         String url = "https://www.omie.es/sites/default/files/dados/AGNO_"+fecha.substring(6,10)+"/MES_"+fecha.substring(3,5)+"/TXT/INT_PBC_TECNOLOGIAS_H_9_"+fecha+"_"+fecha+".TXT";
 
         StringRequest getRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onResponse(String response) {
 
                 //Lo parseamos a un objeto del tipo EnergyByTechnology.
                 try {
-                    EnergyByTechnology energyByTechnology = TxtParser.obtenerSeriesPorTecnologia(response);
-                    //Gráfico:
-                    AreaChart.crearGrafico(mView, energyByTechnology);
+                    energyByTechnology = TxtParser.obtenerSeriesPorTecnologia(response);
+
+                    if(switchIsChecked) {
+                        PieChartUtility.crearGrafico(mView, energyByTechnology);
+                    }
+                    else {
+                        AreaChart.crearGrafico(mView, energyByTechnology);
+                    }
 
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();

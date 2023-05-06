@@ -2,10 +2,12 @@ package com.precioLuz.utils;
 
 import android.graphics.Color;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import androidx.core.content.ContextCompat;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -30,12 +32,16 @@ public class AreaChart {
 
     public static void crearGrafico(View mView, EnergyByTechnology datos) {
 
-        // in this example, a LineChart is initialized from xml
         LineChart chart = mView.findViewById(R.id.lineChart);
-        final int fillColorCarbon = ContextCompat.getColor(chart.getContext(), R.color.carbon);
-        chart.setBackgroundColor(Color.WHITE);
-        chart.setGridBackgroundColor(fillColorCarbon);
-        chart.setDrawGridBackground(true);
+        PieChart pieChart = mView.findViewById(R.id.pieChart);
+
+        //Ocultar PieChart.
+        int width = 0;
+        int height = 0;
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(width, height);
+        pieChart.setLayoutParams(lp);
+
+        chart.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
 
 
         //Opciones del grafico:
@@ -52,6 +58,10 @@ public class AreaChart {
     }
 
     private static void configurarEjesChart(LineChart chart) {
+        final int fillColorCarbon = ContextCompat.getColor(chart.getContext(), R.color.carbon);
+        chart.setBackgroundColor(Color.WHITE);
+        chart.setGridBackgroundColor(fillColorCarbon);
+        chart.setDrawGridBackground(true);
         chart.getLegend().setWordWrapEnabled(true);
         chart.getXAxis().setDrawGridLines(false);
         chart.getAxisLeft().setDrawGridLines(false);

@@ -1,5 +1,6 @@
 package com.precioLuz.utils;
 
+import android.app.ActionBar;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
@@ -9,6 +10,7 @@ import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -54,7 +56,16 @@ public class PieChartUtility {
     @RequiresApi(api = Build.VERSION_CODES.N)
     public static void crearGrafico(View mView, EnergyByTechnology datos) {
 
+        LineChart lineChart = mView.findViewById(R.id.lineChart);
         PieChart chart = mView.findViewById(R.id.pieChart);
+
+        //Ocultar lineChart.
+        int width = 0;
+        int height = 0;
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(width, height);
+        lineChart.setLayoutParams(lp);
+        chart.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+
 
         //Opciones del grafico:
         configurarPieChart(chart);

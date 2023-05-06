@@ -9,7 +9,6 @@ import android.os.Bundle;
 import com.precioLuz.R;
 import com.precioLuz.databinding.ActivityHomeBinding;
 import com.precioLuz.fragments.ChartsFragment;
-import com.precioLuz.fragments.PieChartFragment;
 import com.precioLuz.fragments.PricesFragment;
 import com.precioLuz.fragments.SettingsFragment;
 import com.precioLuz.providers.AuthProvider;
