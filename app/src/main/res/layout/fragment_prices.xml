@@ -11,7 +11,7 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
@@ -21,22 +21,27 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="10dp"
                 android:text="28/01/2023"
+                android:layout_weight="1"
                 android:textColor="@color/design_default_color_primary"
-                android:textSize="20dp"
-                android:layout_weight="1"/>
+                android:textSize="20dp"/>
 
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/switchEnergia"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
                 android:text="KWh"
                 android:textColor="@color/design_default_color_primary"
-                android:textSize="20dp"
-                android:layout_marginStart="150dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+                android:textSize="20dp"/>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switchGrafica"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:text="Gráfica"
+                android:textColor="@color/design_default_color_primary"
+                android:textSize="20dp"/>
 
         </LinearLayout>
 
@@ -53,6 +58,13 @@
             android:layout_height="match_parent"
             android:scrollbars="vertical" >
         </ListView>
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/linePricesChart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+
 
     </LinearLayout>
 

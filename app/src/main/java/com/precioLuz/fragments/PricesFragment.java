@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -38,6 +39,8 @@ import com.precioLuz.models.PreciosJSON;
 import com.precioLuz.providers.AuthProvider;
 import com.precioLuz.providers.CalendarDatePickerProvider;
 import com.precioLuz.utils.JsonPricesParser;
+import com.precioLuz.utils.LineChart;
+import com.precioLuz.utils.PieChartUtility;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -63,10 +66,12 @@ public class PricesFragment extends Fragment {
     AuthProvider mAuthProvider;
     View mView;
     ListView listaItemsPrecios;
+    com.github.mikephil.charting.charts.LineChart linePricesChart;
     TextView fecha;
     List<PreciosJSON> mList = new ArrayList<>();
     PricesAdapter mAdapter;
     SwitchMaterial switchEnergia;
+    SwitchMaterial switchGrafica;
     SpotsDialog mDialog; //Cargando
 
 
@@ -132,8 +137,10 @@ public class PricesFragment extends Fragment {
         // Inflate the layout for this fragment
         mView = inflater.inflate(R.layout.fragment_prices, container, false);
         listaItemsPrecios= mView.findViewById(R.id.listaItemsPrecios);
+        linePricesChart = mView.findViewById(R.id.linePricesChart);
         fecha = mView.findViewById(R.id.date);
         switchEnergia = mView.findViewById(R.id.switchEnergia);
+        switchGrafica = mView.findViewById(R.id.switchGrafica);
         mDialog = new SpotsDialog(getContext());
 
         //Inicializamos las fechas de hoy y mañana por defecto.
@@ -183,6 +190,29 @@ public class PricesFragment extends Fragment {
                 }
             }
         });
+
+        switchGrafica.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked) {
+                    switchGrafica.setText("Gráfica");
+                    switchEnergia.setVisibility(View.INVISIBLE);
+                    LineChart.crearGrafico(mView, mList);
+
+                }
+                else {
+                    switchGrafica.setText("Lista");
+                    switchEnergia.setVisibility(View.VISIBLE);
+                    //Ocultar LineChart.
+                    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, 0);
+                    linePricesChart.setLayoutParams(lp);
+
+                    listaItemsPrecios.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+
+                }
+            }
+        });
+
     }
 
     private void leerWSESIOS(String [] _fechasBusqueda) {
@@ -201,14 +231,21 @@ public class PricesFragment extends Fragment {
                     mList.clear();
                     mList.addAll(Arrays.asList(preciosJSON));
 
-                    //Creamos el adaptador con los datos de la lista.
-                    mAdapter = new PricesAdapter(requireContext(),R.layout.item_lista_precios, mList, switchEnergia.isChecked());
+                    if(switchGrafica.isChecked()) {//Grafica
+                        switchEnergia.setVisibility(View.INVISIBLE);
+                        LineChart.crearGrafico(mView, mList);
+                    }
+                    else {//Lista
+                        //Creamos el adaptador con los datos de la lista.
+                        mAdapter = new PricesAdapter(requireContext(),R.layout.item_lista_precios, mList, switchEnergia.isChecked());
 
-                    //Vaciamos la lista al cambiar de día:
-                    listaItemsPrecios.setAdapter(null);
+                        //Vaciamos la lista al cambiar de día:
+                        listaItemsPrecios.setAdapter(null);
 
-                    //Cargamos los datos del adapter a la vista.
-                    listaItemsPrecios.setAdapter(mAdapter);
+                        //Cargamos los datos del adapter a la vista.
+                        listaItemsPrecios.setAdapter(mAdapter);
+                    }
+
 
                 } catch (JSONException e) {
                     e.printStackTrace();
