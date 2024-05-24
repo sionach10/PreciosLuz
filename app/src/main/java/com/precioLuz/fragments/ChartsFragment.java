@@ -163,11 +163,11 @@ public class ChartsFragment extends Fragment {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked) {
                     switchIsChecked = true;
-                    PieChartUtility.crearGrafico(mView, energyByTechnology);
+                    AreaChart.crearGrafico(mView, energyByTechnology);
                 }
                 else {
                     switchIsChecked = false;
-                    AreaChart.crearGrafico(mView, energyByTechnology);
+                    PieChartUtility.crearGrafico(mView, energyByTechnology);
                 }
             }
         });
@@ -190,10 +190,10 @@ public class ChartsFragment extends Fragment {
                     energyByTechnology = TxtParser.obtenerSeriesPorTecnologia(response);
 
                     if(switchIsChecked) {
-                        PieChartUtility.crearGrafico(mView, energyByTechnology);
+                        AreaChart.crearGrafico(mView, energyByTechnology);
                     }
                     else {
-                        AreaChart.crearGrafico(mView, energyByTechnology);
+                        PieChartUtility.crearGrafico(mView, energyByTechnology);
                     }
 
                 } catch (FileNotFoundException e) {

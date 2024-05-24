@@ -14,7 +14,7 @@
     <color name="rojo">#BF0000</color>
     <color name="azul">#006BDD</color>
     <color name="verde">#0CB600</color>
-
+    <color name="colorHoraActual">#BCEFB9</color>
     <color name="carbon">#686868</color>
     <color name="nuclear">#a4d9e7</color>
     <color name="hidraulica">#00b3d0</color>

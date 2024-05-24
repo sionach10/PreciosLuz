@@ -31,13 +31,10 @@ public class HomeActivity extends AppCompatActivity {
         binding.bottomNavigation.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.itemHome:
-                    openFragment(new PricesFragment());
-                    return true;
-                case R.id.itemHistory:
                     openFragment(new ChartsFragment());
                     return true;
-                case R.id.itemSettings:
-                    openFragment(new SettingsFragment());
+                case R.id.itemHistory:
+                    openFragment(new PricesFragment());
                     return true;
             }
 
@@ -48,7 +45,7 @@ public class HomeActivity extends AppCompatActivity {
         mAuthProvider = new AuthProvider();
         mUserProvider = new UserProvider();
 
-        openFragment(new PricesFragment());
+        openFragment(new ChartsFragment());
         createToken();
     }
 

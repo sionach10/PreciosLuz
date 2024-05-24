@@ -69,6 +69,9 @@
         <entry key="..\:/Apps_Android/SocialTravel/app/src/main/res/xml/file_paths.xml" value="0.13508771929824562" />
         <entry key="..\:/Desarrollo/Apps_Android/PreciosLuz/app/src/main/res/layout/activity_home.xml" value="0.11891891891891893" />
         <entry key="..\:/Desarrollo/Apps_Android/PreciosLuz/app/src/main/res/layout/activity_main.xml" value="0.25" />
+        <entry key="..\:/Desarrollo/Apps_Android/PreciosLuz/app/src/main/res/layout/fragment_charts.xml" value="0.15303430079155672" />
+        <entry key="..\:/Desarrollo/Apps_Android/PreciosLuz/app/src/main/res/layout/fragment_prices.xml" value="0.15303430079155672" />
+        <entry key="..\:/Desarrollo/Apps_Android/PreciosLuz/app/src/main/res/menu/bottom_navigation_menu.xml" value="0.31351351351351353" />
       </map>
     </option>
   </component>

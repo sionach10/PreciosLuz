@@ -8,12 +8,6 @@
     <item
         android:id="@+id/itemHistory"
         android:icon="@drawable/ic_graph"
-        android:title="Análisis" />
-
-    <item
-        android:id="@+id/itemSettings"
-        android:icon="@drawable/ic_settings"
-        android:title="Ajustes" />
-
+        android:title="Detalle Horario" />
 
 </menu>

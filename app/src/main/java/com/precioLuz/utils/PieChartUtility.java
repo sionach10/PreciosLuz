@@ -93,6 +93,7 @@ public class PieChartUtility {
         chart.setRotationAngle(0);
         chart.setRotationEnabled(true);
         chart.animateY(1400, Easing.EaseInOutQuad);
+
         // chart.spin(2000, 0, 360);
         Legend l = chart.getLegend();
         l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
@@ -137,6 +138,7 @@ public class PieChartUtility {
 
         for(String key : energiaAgregada.keySet()) {
             entriesPercent.add(new PieEntry(energiaAgregada.get(key),key));
+
         }
 
 
@@ -161,6 +163,8 @@ public class PieChartUtility {
 
         PieData pieData = new PieData(pieDataSet);
         pieData.setValueFormatter(new PercentFormatter(chart));
+        chart.setEntryLabelColor(R.color.purple_700);
+
         chart.setData(pieData);
     }
 
