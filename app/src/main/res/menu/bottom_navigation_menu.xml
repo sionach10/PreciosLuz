@@ -6,7 +6,7 @@
         android:title="Home" />
 
     <item
-        android:id="@+id/itemHistory"
+        android:id="@+id/itemHourDetail"
         android:icon="@drawable/ic_graph"
         android:title="Detalle Horario" />
 
