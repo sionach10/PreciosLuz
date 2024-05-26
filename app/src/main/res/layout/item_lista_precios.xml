@@ -2,47 +2,45 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".fragments.PricesFragment"
-    android:layout_marginBottom="50dp">
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:background="@drawable/item_background"
+    android:elevation="4dp"
+    android:padding="16dp"
+    tools:context=".fragments.PricesFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
         <ImageView
             android:id="@+id/priceColor"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:src="@drawable/mood_green"
-            android:layout_marginLeft="15dp"
-            android:layout_marginTop="15dp"
-             />
+            android:layout_marginEnd="16dp" />
 
         <TextView
             android:id="@+id/hour"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="15dp"
-            android:layout_marginTop="15dp"
+            android:layout_weight="1"
             android:text="00-01H"
             android:textColor="@color/design_default_color_primary"
-            android:textSize="20dp" />
+            android:textSize="20sp"
+            android:fontFamily="sans-serif-medium" />
 
         <TextView
             android:id="@+id/price"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="15dp"
-            android:layout_marginTop="15dp"
-            android:gravity="right"
-            android:text="0.07 €/KWh"
+            android:text="0.0745 €/KWh"
             android:textColor="@color/design_default_color_primary"
-            android:textSize="20dp" />
-
+            android:textSize="20sp"
+            android:fontFamily="sans-serif-medium" />
 
     </LinearLayout>
-
 
 </RelativeLayout>
