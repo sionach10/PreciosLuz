@@ -127,13 +127,13 @@ public class PieChartUtility {
         //Sumamos la energia de cada tecnología a lo largo de todas las horas de ese día.
         //Con la función sum() nos ahorramos el bucle for recorriendo las horas.
         energiaAgregada.put("Carbon", (int) Math.floor(datos.getCarbon().values().stream().mapToDouble(Float::floatValue).sum()));
-        energiaAgregada.put("nuclear", (int) Math.floor(datos.getNuclear().values().stream().mapToDouble(Float::floatValue).sum()));
-        energiaAgregada.put("hidraulica", (int) Math.floor(datos.getHidraulica().values().stream().mapToDouble(Float::floatValue).sum()));
-        energiaAgregada.put("ciclo_combinado", (int) Math.floor(datos.getCiclo_combinado().values().stream().mapToDouble(Float::floatValue).sum()));
-        energiaAgregada.put("eolica", (int) Math.floor(datos.getEolica().values().stream().mapToDouble(Float::floatValue).sum()));
-        energiaAgregada.put("solar_termica", (int) Math.floor(datos.getSolar_termica().values().stream().mapToDouble(Float::floatValue).sum()));
-        energiaAgregada.put("solar_fotovoltaica", (int) Math.floor(datos.getSolar_fotovoltaica().values().stream().mapToDouble(Float::floatValue).sum()));
-        energiaAgregada.put("cogen", (int) Math.floor(datos.getCogen().values().stream().mapToDouble(Float::floatValue).sum()));
+        energiaAgregada.put("Nuclear", (int) Math.floor(datos.getNuclear().values().stream().mapToDouble(Float::floatValue).sum()));
+        energiaAgregada.put("Hidraulica", (int) Math.floor(datos.getHidraulica().values().stream().mapToDouble(Float::floatValue).sum()));
+        energiaAgregada.put("Ciclo Combinado", (int) Math.floor(datos.getCiclo_combinado().values().stream().mapToDouble(Float::floatValue).sum()));
+        energiaAgregada.put("Eolica", (int) Math.floor(datos.getEolica().values().stream().mapToDouble(Float::floatValue).sum()));
+        energiaAgregada.put("Solar termica", (int) Math.floor(datos.getSolar_termica().values().stream().mapToDouble(Float::floatValue).sum()));
+        energiaAgregada.put("Solar fotovoltaica", (int) Math.floor(datos.getSolar_fotovoltaica().values().stream().mapToDouble(Float::floatValue).sum()));
+        energiaAgregada.put("Cogeneración", (int) Math.floor(datos.getCogen().values().stream().mapToDouble(Float::floatValue).sum()));
 
 
         for(String key : energiaAgregada.keySet()) {

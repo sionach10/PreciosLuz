@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_marginBottom="60dp">
+    android:paddingBottom="60dp"> <!-- Ajuste de padding para acomodar el banner -->
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/adView"
+        android:layout_marginBottom="10dp"
         android:orientation="vertical">
 
         <LinearLayout
@@ -50,22 +52,32 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginHorizontal="5dp"
+            android:layout_marginBottom="3dp"
             android:background="@color/design_default_color_primary" />
 
         <ListView
             android:id="@+id/listaItemsPrecios"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbars="vertical" >
+            android:layout_height="0dp"
+            android:scrollbars="vertical"
+            android:layout_weight="1" >
         </ListView>
 
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/linePricesChart"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-
+            android:layout_height="0dp"
+            android:layout_weight="0" />
 
     </LinearLayout>
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-9481599917802359/1104606528"/>
 
 </RelativeLayout>

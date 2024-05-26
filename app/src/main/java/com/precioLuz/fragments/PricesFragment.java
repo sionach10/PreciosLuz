@@ -30,6 +30,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.precioLuz.R;
 import com.precioLuz.activities.HomeActivity;
@@ -61,7 +63,6 @@ public class PricesFragment extends Fragment {
     public PricesFragment() {
         //Required empty public constructor
     }
-
     //Variables globales
     AuthProvider mAuthProvider;
     View mView;
@@ -81,6 +82,7 @@ public class PricesFragment extends Fragment {
     private final int startYear = mCalendar.get(Calendar.YEAR);
     String [] fechasBusqueda = new String[2];
     String [] fechasDefault = new String[2];
+    private AdView mAdView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -91,8 +93,8 @@ public class PricesFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        this.getActivity().setTitle("Precios horarios");
         inflater.inflate(R.menu.main_menu, menu);
-        this.getActivity().setTitle("Precios horarios PVPC");
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -142,6 +144,11 @@ public class PricesFragment extends Fragment {
         switchEnergia = mView.findViewById(R.id.switchEnergia);
         switchGrafica = mView.findViewById(R.id.switchGrafica);
         mDialog = new SpotsDialog(getContext());
+
+        //Banner anuncio
+        mAdView = mView.findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
         //Inicializamos las fechas de hoy y mañana por defecto.
         try {
