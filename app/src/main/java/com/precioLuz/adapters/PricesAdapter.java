@@ -71,8 +71,14 @@ public class PricesAdapter extends ArrayAdapter<PreciosJSON> {
 
         hour.setText(item.getHour());
 
-        if(currentHour.equals(item.getHour().substring(0,2)))
+        /*TODO
+        if(currentHour.equals(item.getHour().substring(0,2))){
             mView.setBackgroundColor(ContextCompat.getColor(this.mContext, R.color.colorHoraActual));
+            mView.setPadding(16,16,16,16);
+            mView.set
+        }
+         */
+
 
         //Adaptamos valor a KWh/MWh:
         if(switchEnergia) { //MWh
