@@ -1,7 +1,6 @@
 package com.precioLuz.fragments;
 
 import android.app.DatePickerDialog;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,9 +30,7 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.precioLuz.R;
-import com.precioLuz.activities.MainActivity;
 import com.precioLuz.models.EnergyByTechnology;
-import com.precioLuz.providers.AuthProvider;
 import com.precioLuz.providers.CalendarDatePickerProvider;
 import com.precioLuz.utils.AreaChart;
 import com.precioLuz.utils.PieChartUtility;
@@ -51,7 +48,6 @@ import dmax.dialog.SpotsDialog;
 public class ChartsFragment extends Fragment {
 
     private View mView;
-    private AuthProvider mAuthProvider;
     private final Calendar mCalendar = Calendar.getInstance();
     private int startDay = mCalendar.get(Calendar.DAY_OF_MONTH);
     private int startMonth = mCalendar.get(Calendar.MONTH); //Los meses los devuelve de 0 a 11.
@@ -73,7 +69,6 @@ public class ChartsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true); // Indica que este fragmento tiene un menú de opciones
-        mAuthProvider = new AuthProvider();
         MobileAds.initialize(getContext(), initializationStatus -> {});
         super.onCreate(savedInstanceState);
     }
@@ -88,12 +83,6 @@ public class ChartsFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.itemLogout:
-                mAuthProvider.logout();
-                Intent intent = new Intent(getContext(), MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK); //Limpiamos historial del botón atras.
-                startActivity(intent);
-                return true;
             case R.id.itemCalendar:
                 DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
                     @Override

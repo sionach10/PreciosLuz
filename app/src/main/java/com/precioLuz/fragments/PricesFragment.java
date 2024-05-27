@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -21,7 +20,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import com.android.volley.AuthFailureError;
@@ -34,21 +32,17 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.precioLuz.R;
-import com.precioLuz.activities.HomeActivity;
 import com.precioLuz.activities.MainActivity;
 import com.precioLuz.adapters.PricesAdapter;
 import com.precioLuz.models.PreciosJSON;
-import com.precioLuz.providers.AuthProvider;
 import com.precioLuz.providers.CalendarDatePickerProvider;
 import com.precioLuz.utils.JsonPricesParser;
 import com.precioLuz.utils.LineChart;
-import com.precioLuz.utils.PieChartUtility;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -64,7 +58,6 @@ public class PricesFragment extends Fragment {
         //Required empty public constructor
     }
     //Variables globales
-    AuthProvider mAuthProvider;
     View mView;
     ListView listaItemsPrecios;
     com.github.mikephil.charting.charts.LineChart linePricesChart;
@@ -87,7 +80,6 @@ public class PricesFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        mAuthProvider = new AuthProvider();
         super.onCreate(savedInstanceState);
     }
 
@@ -102,12 +94,6 @@ public class PricesFragment extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
         switch (item.getItemId()){
-            case R.id.itemLogout:
-                mAuthProvider.logout();
-                Intent intent = new Intent(getContext(), MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK); //Limpiamos historial del botón atras.
-                startActivity(intent);
-                return true;
             case R.id.itemCalendar:
                 DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
                     @Override

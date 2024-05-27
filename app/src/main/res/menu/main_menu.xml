@@ -6,8 +6,4 @@
         android:title="Calendario"
         android:icon="@drawable/ic_baseline_calendar_month_24"
         app:showAsAction="always"/>
-
-    <item android:id="@+id/itemLogout"
-        android:title="Cerrar sesión"
-        app:showAsAction="never"/>
 </menu>

@@ -13,19 +13,11 @@ import com.precioLuz.R;
 import com.precioLuz.databinding.ActivityHomeBinding;
 import com.precioLuz.fragments.ChartsFragment;
 import com.precioLuz.fragments.PricesFragment;
-import com.precioLuz.fragments.SettingsFragment;
-import com.precioLuz.providers.AuthProvider;
-import com.precioLuz.providers.TokenProvider;
-import com.precioLuz.providers.UserProvider;
 
 public class HomeActivity extends AppCompatActivity {
 
     ActivityHomeBinding binding;
-    TokenProvider mTokenProvider;
-    AuthProvider mAuthProvider;
-    UserProvider mUserProvider;
     private ViewPager2 viewPager;
-    private FragmentStateAdapter pagerAdapter;
     private BottomNavigationView bottomNavigationView;
 
     @Override
@@ -38,7 +30,7 @@ public class HomeActivity extends AppCompatActivity {
         bottomNavigationView = binding.bottomNavigation;
 
         // Configura el adaptador del ViewPager2
-        pagerAdapter = new ScreenSlidePagerAdapter(this);
+        FragmentStateAdapter pagerAdapter = new ScreenSlidePagerAdapter(this);
         viewPager.setAdapter(pagerAdapter);
 
         // Listener para el ViewPager2
@@ -70,11 +62,6 @@ public class HomeActivity extends AppCompatActivity {
             return false;
         });
 
-        mTokenProvider = new TokenProvider();
-        mAuthProvider = new AuthProvider();
-        mUserProvider = new UserProvider();
-
-        createToken();
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStateAdapter {
@@ -98,9 +85,5 @@ public class HomeActivity extends AppCompatActivity {
         public int getItemCount() {
             return 2; // Número de fragmentos
         }
-    }
-
-    private void createToken() {
-        mTokenProvider.create(mAuthProvider.getUid());
     }
 }
