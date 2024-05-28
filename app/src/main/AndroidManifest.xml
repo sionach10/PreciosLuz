@@ -23,7 +23,7 @@
         tools:targetApi="31">
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.precioLuz"
+            android:authorities="${applicationId}.mycontentprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -35,9 +35,6 @@
             android:exported="false"
             android:windowSoftInputMode="adjustNothing" /> <!-- Para que al hacer clic en la busqueda y aparezca el teclado, no se descuadre el bottomNavigation -->
         <activity
-            android:name="com.precioLuz.activities.RegisterActivity"
-            android:exported="false" />
-        <activity
             android:name="com.precioLuz.activities.MainActivity"
             android:exported="true">
             <intent-filter>
@@ -47,14 +44,6 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name="com.precioLuz.services.MyFirebaseMessagingClient"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/default_notification_channel_id" />
@@ -63,10 +52,6 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-9481599917802359~6585445179"/>
-
-        <receiver android:name="com.precioLuz.receivers.MessageReceiver"
-            android:enabled="true"
-            android:exported="false"/>
 
     </application>
 
