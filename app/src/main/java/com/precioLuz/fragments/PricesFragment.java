@@ -1,26 +1,18 @@
 package com.precioLuz.fragments;
 
-import android.app.DatePickerDialog;
-import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
-import android.widget.DatePicker;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -32,7 +24,6 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.precioLuz.R;
-import com.precioLuz.activities.MainActivity;
 import com.precioLuz.adapters.PricesAdapter;
 import com.precioLuz.models.PreciosJSON;
 import com.precioLuz.providers.CalendarDatePickerProvider;
@@ -54,21 +45,17 @@ import dmax.dialog.SpotsDialog;
 
 
 public class PricesFragment extends Fragment {
-    public PricesFragment() {
-        //Required empty public constructor
-    }
-    //Variables globales
-    View mView;
-    ListView listaItemsPrecios;
+
+    //Variables
+    private View mView;
+    private RecyclerView rvListaPrecios;
+    private PricesAdapter pricesAdapter;
+    private List<PreciosJSON> priceList = new ArrayList<>();
     com.github.mikephil.charting.charts.LineChart linePricesChart;
     TextView fecha;
-    List<PreciosJSON> mList = new ArrayList<>();
-    PricesAdapter mAdapter;
     SwitchMaterial switchEnergia;
     SwitchMaterial switchGrafica;
     SpotsDialog mDialog; //Cargando
-
-
     private final Calendar mCalendar = Calendar.getInstance();
     private final int startDay = mCalendar.get(Calendar.DAY_OF_MONTH);
     private final int startMonth = mCalendar.get(Calendar.MONTH); //Los meses los devuelve de 0 a 11.
@@ -77,59 +64,22 @@ public class PricesFragment extends Fragment {
     String [] fechasDefault = new String[2];
     private AdView mAdView;
 
+
+    @Nullable
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        setHasOptionsMenu(true);
-        super.onCreate(savedInstanceState);
-    }
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        this.getActivity().setTitle("Precios horarios");
-        inflater.inflate(R.menu.main_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-        switch (item.getItemId()){
-            case R.id.itemCalendar:
-                DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int _year, int _month, int _dayOfMonth) {
-                        try {
-                            fechasBusqueda = CalendarDatePickerProvider.obtenerFechasFromDatePicker(_dayOfMonth, _month+1, _year);//El datePicker usa los meses de 0 a 11.
-
-                            //Modificamos campo fecha.
-                            fecha.setText(fechasBusqueda[0]);
-
-                            leerWSESIOS(fechasBusqueda);
-
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, startYear, startMonth, startDay); //Variables para inicializar el calendario en el día de hoy.+
-                datePickerDialog.getDatePicker().setMaxDate(mCalendar.getTimeInMillis());//bloqueamos que no hagan clic en fechas futuras.
-                datePickerDialog.show();
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-        // Inflate the layout for this fragment
+        //Inicializamos variables
         mView = inflater.inflate(R.layout.fragment_prices, container, false);
-        listaItemsPrecios= mView.findViewById(R.id.listaItemsPrecios);
+        rvListaPrecios = mView.findViewById(R.id.listaItemsPrecios);
+        rvListaPrecios.setLayoutManager(new LinearLayoutManager(getContext()));
         linePricesChart = mView.findViewById(R.id.linePricesChart);
         fecha = mView.findViewById(R.id.date);
         switchEnergia = mView.findViewById(R.id.switchEnergia);
         switchGrafica = mView.findViewById(R.id.switchGrafica);
         mDialog = new SpotsDialog(getContext());
+        mDialog.show();
+        mDialog.setMessage("Cargando");
 
         //Banner anuncio
         mAdView = mView.findViewById(R.id.adView);
@@ -142,18 +92,8 @@ public class PricesFragment extends Fragment {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return mView;
-    }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        mDialog.show();
-        mDialog.setMessage("Cargando");
-
-        fecha.setText(fechasDefault[0]);
+        //Lectura y carga de datos:
         leerWSESIOS(fechasDefault);
 
         switchEnergia.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -162,50 +102,32 @@ public class PricesFragment extends Fragment {
                 if(isChecked) {
                     switchEnergia.setText("MWh");
                     //Creamos el adaptador con los datos de la lista.
-                    mAdapter = new PricesAdapter(requireContext(),R.layout.item_lista_precios, mList, isChecked); //TODO
+                    pricesAdapter = new PricesAdapter(priceList, true);
 
                     //Vaciamos la lista al cambiar de día:
-                    listaItemsPrecios.setAdapter(null);
+                    rvListaPrecios.setAdapter(null);
 
                     //Cargamos los datos del adapter a la vista.
-                    listaItemsPrecios.setAdapter(mAdapter);
+                    rvListaPrecios.setAdapter(pricesAdapter);
                 }
                 else{
                     switchEnergia.setText("KWh");
                     //Creamos el adaptador con los datos de la lista.
-                    mAdapter = new PricesAdapter(requireContext(),R.layout.item_lista_precios, mList, isChecked); //TODO
+                    pricesAdapter = new PricesAdapter(priceList, false);
 
                     //Vaciamos la lista al cambiar de día:
-                    listaItemsPrecios.setAdapter(null);
+                    rvListaPrecios.setAdapter(null);
 
                     //Cargamos los datos del adapter a la vista.
-                    listaItemsPrecios.setAdapter(mAdapter);
+                    rvListaPrecios.setAdapter(pricesAdapter);
                 }
             }
         });
 
-        switchGrafica.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked) {
-                    switchGrafica.setText("Gráfica");
-                    switchEnergia.setVisibility(View.INVISIBLE);
-                    LineChart.crearGrafico(mView, mList);
+        pricesAdapter = new PricesAdapter(priceList, switchGrafica.isChecked());
+        rvListaPrecios.setAdapter(pricesAdapter);
 
-                }
-                else {
-                    switchGrafica.setText("Lista");
-                    switchEnergia.setVisibility(View.VISIBLE);
-                    //Ocultar LineChart.
-                    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, 0);
-                    linePricesChart.setLayoutParams(lp);
-
-                    listaItemsPrecios.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-
-                }
-            }
-        });
-
+        return mView;
     }
 
     private void leerWSESIOS(String [] _fechasBusqueda) {
@@ -221,22 +143,23 @@ public class PricesFragment extends Fragment {
                     PreciosJSON[] preciosJSON = JsonPricesParser.obtenerJsonHoras(jsonObject, _fechasBusqueda);
 
                     //Añadimos los preciosJSON a una lista, previamente borrada.
-                    mList.clear();
-                    mList.addAll(Arrays.asList(preciosJSON));
+                    priceList.clear();
+                    priceList.addAll(Arrays.asList(preciosJSON));
 
                     if(switchGrafica.isChecked()) {//Grafica
-                        switchEnergia.setVisibility(View.INVISIBLE);
-                        LineChart.crearGrafico(mView, mList);
+                        //switchEnergia.setVisibility(View.INVISIBLE);
+                        //LineChart.crearGrafico(mView, rvListaPrecios);
                     }
                     else {//Lista
+
                         //Creamos el adaptador con los datos de la lista.
-                        mAdapter = new PricesAdapter(requireContext(),R.layout.item_lista_precios, mList, switchEnergia.isChecked());
+                        pricesAdapter = new PricesAdapter(priceList, switchEnergia.isChecked());
 
                         //Vaciamos la lista al cambiar de día:
-                        listaItemsPrecios.setAdapter(null);
+                        rvListaPrecios.setAdapter(null);
 
                         //Cargamos los datos del adapter a la vista.
-                        listaItemsPrecios.setAdapter(mAdapter);
+                        rvListaPrecios.setAdapter(pricesAdapter);
                     }
 
 
@@ -260,6 +183,4 @@ public class PricesFragment extends Fragment {
         };
         Volley.newRequestQueue(requireContext()).add(getRequest);
     }
-
-
 }

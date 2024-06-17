@@ -1,105 +1,82 @@
 package com.precioLuz.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.os.Build;
+import android.graphics.drawable.LayerDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.precioLuz.R;
 import com.precioLuz.models.PreciosJSON;
 
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Calendar;
 import java.util.List;
 
-public class PricesAdapter extends ArrayAdapter<PreciosJSON> {
+public class PricesAdapter extends RecyclerView.Adapter<PricesAdapter.PriceViewHolder> {
 
-    private List<PreciosJSON> mList;
-    private Context mContext;
-    private int resourceLayout;
-    private boolean switchEnergia;
-    private final String magnitudKwh = " €/KWh";
-    private final String magnitudMwh = " €/MWh";
-    private DecimalFormat formato3d = new DecimalFormat("#.###");
+    private List<PreciosJSON> priceList;
+    private boolean magnitudeEnergy;
+
     //Constructor
-    public PricesAdapter(@NonNull Context context, int resource, List<PreciosJSON> objects, boolean switchEnergia) {
-        super(context, resource, objects);
-        this.mList = objects;
-        this.mContext = context;
-        this.resourceLayout = resource;
-        this.switchEnergia = switchEnergia;
+    public PricesAdapter(List<PreciosJSON> priceList, boolean switchEnergia) {
+        this.priceList = priceList;
+        magnitudeEnergy = switchEnergia;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+
+    @NonNull
     @Override
-    public View getView (int position, View convertView, ViewGroup parent) {
-
-        //Salvando la referencia del View de la fila
-        View mView = convertView;
-
-        //Comprobando si el View no existe
-        if (mView == null) {
-            //Si no existe, entonces inflarlo
-            mView = LayoutInflater.from(mContext).inflate(resourceLayout, null);
-        }
-
-        //Obtenemos la hora actual para sombrear la hora actual en el textView.
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH");
-        String currentHour = now.format(dtf);
-
-        //Obteniendo item de la Tarea en la posición actual
-        PreciosJSON item = getItem(position);
-
-        //Obteniendo instancias de los elementos
-        //TextView date = mView.findViewById(R.id.date);
-        ImageView priceColor = mView.findViewById(R.id.priceColor);
-        TextView hour = mView.findViewById(R.id.hour);
-        TextView price = mView.findViewById(R.id.price);
-
-        hour.setText(item.getHour());
-
-        /*TODO
-        if(currentHour.equals(item.getHour().substring(0,2))){
-            mView.setBackgroundColor(ContextCompat.getColor(this.mContext, R.color.colorHoraActual));
-            mView.setPadding(16,16,16,16);
-            mView.set
-        }
-         */
-
-
-        //Adaptamos valor a KWh/MWh:
-        if(switchEnergia) { //MWh
-            float division = Float.parseFloat(item.getPrice());
-            price.setText(formato3d.format(division) + magnitudMwh);
-            if(item.isCheap())
-                priceColor.setImageResource(R.drawable.mood_green);
-            else
-                priceColor.setImageResource(R.drawable.mood_red);
-        }
-        else { //KWh
-            float division = Float.parseFloat(item.getPrice())/1000.0f;
-            price.setText(formato3d.format(division) + magnitudKwh);
-            if(item.isCheap())
-                priceColor.setImageResource(R.drawable.mood_green);
-            else
-                priceColor.setImageResource(R.drawable.mood_red);
-        }
-
-
-        //Devolver al ListView la fila creada
-        return mView;
+    public PricesAdapter.PriceViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_lista_precios, parent, false);
+        return new PriceViewHolder(view);
     }
+
+    public static class PriceViewHolder extends RecyclerView.ViewHolder {
+        TextView hour, price;
+        RelativeLayout relativeLayout;
+
+        public PriceViewHolder(@NonNull View itemView) {
+            super(itemView);
+            hour = itemView.findViewById(R.id.hour);
+            price = itemView.findViewById(R.id.price);
+            relativeLayout = itemView.findViewById(R.id.relativeLayoutItemListaPrecios);
+        }
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull PriceViewHolder holder, int position) {
+
+        PreciosJSON priceItem = priceList.get(position);
+
+        String unit = magnitudeEnergy ? " €/MWh" : " €/KWh";
+        BigDecimal priceCalculated = magnitudeEnergy ?
+                BigDecimal.valueOf(Double.parseDouble(priceItem.getPrice()) / 1000.0).setScale(3, RoundingMode.HALF_UP) : // Redondear a 2 decimales si magnitudeEnergy es true
+                BigDecimal.valueOf(Double.parseDouble(priceItem.getPrice())).setScale(2, RoundingMode.HALF_UP);         // Redondear a 3 decimales si magnitudeEnergy es false
+
+        //Asignación de valores.
+        holder.hour.setText(priceItem.getHour());
+        holder.price.setText(String.format("%s%s", priceCalculated, unit));
+
+        // Obtener la hora actual
+        int currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+        if (currentHour == position) {
+            //holder.relativeLayout.setBackgroundResource(R.drawable.item_background_current_hour);
+
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        return priceList.size();
+    }
+
 }

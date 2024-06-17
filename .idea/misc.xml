@@ -71,6 +71,8 @@
         <entry key="..\:/Desarrollo/Apps_Android/PreciosLuz/app/src/main/res/drawable/ic_home.xml" value="0.13" />
         <entry key="..\:/Desarrollo/Apps_Android/PreciosLuz/app/src/main/res/drawable/ic_icon_edit.xml" value="0.13" />
         <entry key="..\:/Desarrollo/Apps_Android/PreciosLuz/app/src/main/res/drawable/item_background.xml" value="0.2" />
+        <entry key="..\:/Desarrollo/Apps_Android/PreciosLuz/app/src/main/res/drawable/item_background_current_hour.xml" value="0.1785" />
+        <entry key="..\:/Desarrollo/Apps_Android/PreciosLuz/app/src/main/res/drawable/mood_green.xml" value="0.145" />
         <entry key="..\:/Desarrollo/Apps_Android/PreciosLuz/app/src/main/res/layout/activity_home.xml" value="0.11891891891891893" />
         <entry key="..\:/Desarrollo/Apps_Android/PreciosLuz/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/Desarrollo/Apps_Android/PreciosLuz/app/src/main/res/layout/activity_register.xml" value="0.17300724637681159" />

@@ -55,13 +55,13 @@
             android:layout_marginBottom="3dp"
             android:background="@color/design_default_color_primary" />
 
-        <ListView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/listaItemsPrecios"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:scrollbars="vertical"
-            android:layout_weight="1" >
-        </ListView>
+            android:layout_height="600dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_weight="1"/>
 
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/linePricesChart"

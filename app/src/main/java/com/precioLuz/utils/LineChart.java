@@ -7,6 +7,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Description;
@@ -41,7 +42,7 @@ public class LineChart {
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(width, height);
         listViewPrices.setLayoutParams(lp);
 
-        chart.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1550)); //No me coge la altura con MATCH_PARENT.
+        chart.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1550)); //TODO: No me coge la altura con MATCH_PARENT.
 
 
         //Opciones del grafico:
