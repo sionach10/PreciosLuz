@@ -23,6 +23,7 @@ import java.util.Date;
 
 public class JsonPricesParser {
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public static PreciosJSON[] obtenerJsonHoras(JSONObject jsonObject, String[] fechas) throws JSONException {
 
         ArrayList<String> listaPrecios = new ArrayList<>();
@@ -66,7 +67,6 @@ public class JsonPricesParser {
 
         for(int i=0; i<_listaPrecios.size(); i++){
             _preciosJSON[i].setCheap(Float.parseFloat(_listaPrecios.get(i)) <= media); //Forma rapida de asignar true/false.
-            _preciosJSON[i].setUnderAvg(Float.parseFloat(_listaPrecios.get(i)) <= media);
         }
 
         return _preciosJSON;
