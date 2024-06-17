@@ -10,6 +10,7 @@
         <shape android:shape="rectangle">
             <corners android:radius="16dp"/>
             <solid android:color="#809BE38F"/> <!-- Semi-transparent shadow color -->
+            <padding android:left="6dp" android:top="6dp" android:right="6dp" android:bottom="6dp"/>
         </shape>
     </item>
 </layer-list>

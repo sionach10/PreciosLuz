@@ -42,12 +42,14 @@ public class PricesAdapter extends RecyclerView.Adapter<PricesAdapter.PriceViewH
 
     public static class PriceViewHolder extends RecyclerView.ViewHolder {
         TextView hour, price;
+        ImageView iconClock;
         RelativeLayout relativeLayout;
 
         public PriceViewHolder(@NonNull View itemView) {
             super(itemView);
             hour = itemView.findViewById(R.id.hour);
             price = itemView.findViewById(R.id.price);
+            iconClock = itemView.findViewById(R.id.iconClock);
             relativeLayout = itemView.findViewById(R.id.relativeLayoutItemListaPrecios);
         }
     }
@@ -65,13 +67,16 @@ public class PricesAdapter extends RecyclerView.Adapter<PricesAdapter.PriceViewH
         //Asignación de valores.
         holder.hour.setText(priceItem.getHour());
         holder.price.setText(String.format("%s%s", priceCalculated, unit));
+        holder.iconClock.setImageResource(priceItem.isCheap() ? R.drawable.ic_clock_foreground_green : R.drawable.ic_clock_foreground_red);
 
         // Obtener la hora actual
         int currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         if (currentHour == position) {
-            //holder.relativeLayout.setBackgroundResource(R.drawable.item_background_current_hour);
-
+            holder.relativeLayout.setBackgroundResource(R.drawable.item_background_current_hour);
         }
+
+
+
     }
 
     @Override
