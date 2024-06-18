@@ -1,5 +1,6 @@
 package com.precioLuz.fragments;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,6 +28,7 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.precioLuz.R;
 import com.precioLuz.adapters.PricesAdapter;
 import com.precioLuz.models.PreciosJSON;
+import com.precioLuz.models.RespuestaESIOS;
 import com.precioLuz.providers.CalendarDatePickerProvider;
 import com.precioLuz.utils.JsonPricesParser;
 import com.precioLuz.utils.LineChart;
@@ -33,6 +36,8 @@ import com.precioLuz.utils.LineChart;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,7 +57,7 @@ public class PricesFragment extends Fragment {
     private PricesAdapter pricesAdapter;
     private List<PreciosJSON> priceList = new ArrayList<>();
     com.github.mikephil.charting.charts.LineChart linePricesChart;
-    TextView fecha;
+    TextView fecha, precioMedio, horaValle, horaPunta, precioValle, precioPunta;
     SwitchMaterial switchEnergia;
     SwitchMaterial switchGrafica;
     SpotsDialog mDialog; //Cargando
@@ -63,6 +68,7 @@ public class PricesFragment extends Fragment {
     String [] fechasBusqueda = new String[2];
     String [] fechasDefault = new String[2];
     private AdView mAdView;
+    private RespuestaESIOS respuestaESIOSCardView;
 
 
     @Nullable
@@ -77,6 +83,11 @@ public class PricesFragment extends Fragment {
         fecha = mView.findViewById(R.id.date);
         switchEnergia = mView.findViewById(R.id.switchEnergia);
         switchGrafica = mView.findViewById(R.id.switchGrafica);
+        precioMedio = mView.findViewById(R.id.dailyAverageValue);
+        precioValle = mView.findViewById(R.id.horaVallePrice);
+        precioPunta = mView.findViewById(R.id.horaPuntaPrice);
+        horaValle = mView.findViewById(R.id.horaValleValue);
+        horaPunta = mView.findViewById(R.id.horaPuntaValue);
         mDialog = new SpotsDialog(getContext());
         mDialog.show();
         mDialog.setMessage("Cargando");
@@ -99,8 +110,20 @@ public class PricesFragment extends Fragment {
         switchEnergia.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                //Seteamos valores del cardView
+                BigDecimal bdPrecioValle = new BigDecimal(respuestaESIOSCardView.getPrecioValle());
+                BigDecimal bdPrecioMedio = respuestaESIOSCardView.getMedia();
+                BigDecimal bdPrecioPunta = new BigDecimal(respuestaESIOSCardView.getPrecioPunta());
+                BigDecimal bdmil = new BigDecimal("1000");
+
+
                 if(isChecked) {
                     switchEnergia.setText("MWh");
+                    precioValle.setText(respuestaESIOSCardView.getPrecioValle() + "€/MWh");
+                    precioMedio.setText(respuestaESIOSCardView.getMedia() + "€");
+                    precioPunta.setText(respuestaESIOSCardView.getPrecioPunta() + "€/MWh");
+
                     //Creamos el adaptador con los datos de la lista.
                     pricesAdapter = new PricesAdapter(priceList, true);
 
@@ -112,6 +135,10 @@ public class PricesFragment extends Fragment {
                 }
                 else{
                     switchEnergia.setText("KWh");
+                    precioValle.setText(bdPrecioValle.divide(bdmil,3, RoundingMode.HALF_UP) + "€/KWh");
+                    precioMedio.setText(bdPrecioMedio.divide(bdmil,3, RoundingMode.HALF_UP) + "€");
+                    precioPunta.setText(bdPrecioPunta.divide(bdmil,3, RoundingMode.HALF_UP) + "€/KWh");
+
                     //Creamos el adaptador con los datos de la lista.
                     pricesAdapter = new PricesAdapter(priceList, false);
 
@@ -134,23 +161,43 @@ public class PricesFragment extends Fragment {
 
         String url = "https://api.esios.ree.es/indicators/10391?geo_ids[]=8741&start_date="+_fechasBusqueda[0]+"&end_date="+_fechasBusqueda[1];
         StringRequest getRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onResponse(String response) {
                 try {
                     JSONObject jsonObject = new JSONObject(response);//Recibimos el JSON.
 
                     //Lo parseamos a un objeto del tipo PreciosJSON.
-                    PreciosJSON[] preciosJSON = JsonPricesParser.obtenerJsonHoras(jsonObject, _fechasBusqueda);
+                    RespuestaESIOS respuestaESIOS = JsonPricesParser.obtenerJsonHoras(jsonObject, _fechasBusqueda);
 
                     //Añadimos los preciosJSON a una lista, previamente borrada.
                     priceList.clear();
-                    priceList.addAll(Arrays.asList(preciosJSON));
+                    priceList.addAll(Arrays.asList(respuestaESIOS.getPreciosJSON()));
 
                     if(switchGrafica.isChecked()) {//Grafica
                         //switchEnergia.setVisibility(View.INVISIBLE);
                         //LineChart.crearGrafico(mView, rvListaPrecios);
                     }
                     else {//Lista
+
+                        //Me guardo los valores de cardView para modificarlos fuera de esta funcion
+                        respuestaESIOSCardView = respuestaESIOS;
+
+                        //Seteamos valores del cardView
+                        BigDecimal bdPrecioValle = new BigDecimal(respuestaESIOS.getPrecioValle());
+                        BigDecimal bdPrecioMedio = respuestaESIOS.getMedia();
+                        BigDecimal bdPrecioPunta = new BigDecimal(respuestaESIOS.getPrecioPunta());
+                        BigDecimal bdmil = new BigDecimal("1000");
+
+                        //Seteamos valores del cardView
+                        horaValle.setText(respuestaESIOS.getHoraValle());
+                        precioValle.setText(bdPrecioValle.divide(bdmil,3, RoundingMode.HALF_UP) + "€/KWh");
+                        precioMedio.setText(bdPrecioMedio.divide(bdmil,3, RoundingMode.HALF_UP) + "€/KWh");
+                        horaPunta.setText(respuestaESIOS.getHoraPunta());
+                        precioPunta.setText(bdPrecioPunta.divide(bdmil,3, RoundingMode.HALF_UP) + "€/KWh");
+
+
+
 
                         //Creamos el adaptador con los datos de la lista.
                         pricesAdapter = new PricesAdapter(priceList, switchEnergia.isChecked());

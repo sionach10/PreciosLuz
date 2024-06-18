@@ -61,8 +61,8 @@ public class PricesAdapter extends RecyclerView.Adapter<PricesAdapter.PriceViewH
 
         String unit = magnitudeEnergy ? " €/MWh" : " €/KWh";
         BigDecimal priceCalculated = magnitudeEnergy ?
-                BigDecimal.valueOf(Double.parseDouble(priceItem.getPrice()) / 1000.0).setScale(3, RoundingMode.HALF_UP) : // Redondear a 2 decimales si magnitudeEnergy es true
-                BigDecimal.valueOf(Double.parseDouble(priceItem.getPrice())).setScale(2, RoundingMode.HALF_UP);         // Redondear a 3 decimales si magnitudeEnergy es false
+                BigDecimal.valueOf(Double.parseDouble(priceItem.getPrice())).setScale(2, RoundingMode.HALF_UP) :         // Redondear a 2 decimales si magnitudeEnergy es true;
+                BigDecimal.valueOf(Double.parseDouble(priceItem.getPrice()) / 1000.0).setScale(3, RoundingMode.HALF_UP); // Redondear a 3 decimales si magnitudeEnergy es false;
 
         //Asignación de valores.
         holder.hour.setText(priceItem.getHour());

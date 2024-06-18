@@ -9,27 +9,30 @@ import androidx.annotation.RequiresApi;
 
 import com.google.type.DateTime;
 import com.precioLuz.models.PreciosJSON;
+import com.precioLuz.models.RespuestaESIOS;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 public class JsonPricesParser {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static PreciosJSON[] obtenerJsonHoras(JSONObject jsonObject, String[] fechas) throws JSONException {
+    public static RespuestaESIOS obtenerJsonHoras(JSONObject jsonObject, String[] fechas) throws JSONException {
 
         ArrayList<String> listaPrecios = new ArrayList<>();
         ArrayList<String> listaHoras = new ArrayList<>();
-
-        PreciosJSON[] preciosJSON;
+        RespuestaESIOS respuestaESIOS = null;
 
         JSONArray jsonValues = jsonObject.getJSONObject("indicator").getJSONArray("values");
 
@@ -39,18 +42,24 @@ public class JsonPricesParser {
             listaHoras.add(json.getString("datetime"));
         }
 
-        preciosJSON = parserJSON(listaPrecios, listaHoras);
+        respuestaESIOS = parserJSON(listaPrecios, listaHoras);
 
-        return preciosJSON;
+        return respuestaESIOS;
     }
 
     //Convertimos los JSONObject en objetos tipo PreciosJSON
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private static PreciosJSON[] parserJSON(ArrayList<String> _listaPrecios, ArrayList<String> _listaHoras) throws JSONException {
+    private static RespuestaESIOS parserJSON(ArrayList<String> _listaPrecios, ArrayList<String> _listaHoras) throws JSONException {
 
         PreciosJSON[] _preciosJSON = new PreciosJSON[24];
         float suma = 0;
-        float media = 0;
+        float _precioMedio;
+        BigDecimal precioMedio;
+        String horaValle = "";
+        String horaPunta = "";
+        String precioValle = "9999";//Inicializamos a un valor alto
+        String precioPunta = "-500";//Inicializamos a un valor bajo
+
         DecimalFormat df = new DecimalFormat("00");
 
         for(int i=0; i<_listaPrecios.size(); i++) {
@@ -61,15 +70,27 @@ public class JsonPricesParser {
             _preciosJSON[i].setHour(_listaHoras.get(i).substring(11,13)+"-"+ nextHourS+"h");
             _preciosJSON[i].setPrice(_listaPrecios.get(i));
             suma+=Float.parseFloat(_listaPrecios.get(i));
+
+            if (Float.parseFloat(_preciosJSON[i].getPrice())<Float.parseFloat(precioValle)) {
+                precioValle = _preciosJSON[i].getPrice();
+                horaValle=_preciosJSON[i].getHour();
+            }
+
+            if (Float.parseFloat(_preciosJSON[i].getPrice())>Float.parseFloat(precioPunta)) {
+                precioPunta = _preciosJSON[i].getPrice();
+                horaPunta=_preciosJSON[i].getHour();
+            }
+
         }
 
-        media = suma/_listaPrecios.size();
+        _precioMedio = suma/_listaPrecios.size();
+        precioMedio = new BigDecimal(_precioMedio).setScale(2, RoundingMode.HALF_UP);
 
         for(int i=0; i<_listaPrecios.size(); i++){
-            _preciosJSON[i].setCheap(Float.parseFloat(_listaPrecios.get(i)) <= media); //Forma rapida de asignar true/false.
+            _preciosJSON[i].setCheap(Float.parseFloat(_listaPrecios.get(i)) <= _precioMedio); //Forma rapida de asignar true/false.
         }
 
-        return _preciosJSON;
+        return new RespuestaESIOS(_preciosJSON, precioMedio, horaValle, horaPunta, precioValle, precioPunta);
     }
 
 }
