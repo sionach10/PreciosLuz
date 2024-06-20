@@ -1,20 +1,28 @@
 package com.precioLuz.fragments;
 
+import android.app.DatePickerDialog;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
+import android.widget.DatePicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -36,6 +44,7 @@ import com.precioLuz.utils.LineChart;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.ParseException;
@@ -70,6 +79,42 @@ public class PricesFragment extends Fragment {
     private AdView mAdView;
     private RespuestaESIOS respuestaESIOSCardView;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true); // Indica que este fragmento tiene un menú de opciones
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.main_menu, menu);
+        this.getActivity().setTitle("Precio horario");
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.itemCalendar:
+                DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int _year, int _month, int _dayOfMonth) {
+                        try {
+                            fechasBusqueda = CalendarDatePickerProvider.obtenerFechasFromDatePicker(_dayOfMonth, _month + 1, _year); //El datePicker usa los meses de 0 a 11.
+                            fecha.setText(fechasBusqueda[0]);
+                            leerWSESIOS(fechasBusqueda);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, startYear, startMonth, startDay); //Variables para inicializar el calendario en el día de hoy.
+                datePickerDialog.getDatePicker().setMaxDate(mCalendar.getTimeInMillis()); //bloqueamos que no hagan clic en fechas futuras.
+                datePickerDialog.show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     @Nullable
     @Override
@@ -121,7 +166,7 @@ public class PricesFragment extends Fragment {
                 if(isChecked) {
                     switchEnergia.setText("MWh");
                     precioValle.setText(respuestaESIOSCardView.getPrecioValle() + "€/MWh");
-                    precioMedio.setText(respuestaESIOSCardView.getMedia() + "€");
+                    precioMedio.setText(respuestaESIOSCardView.getMedia() + "€/MWh");
                     precioPunta.setText(respuestaESIOSCardView.getPrecioPunta() + "€/MWh");
 
                     //Creamos el adaptador con los datos de la lista.
@@ -136,7 +181,7 @@ public class PricesFragment extends Fragment {
                 else{
                     switchEnergia.setText("KWh");
                     precioValle.setText(bdPrecioValle.divide(bdmil,3, RoundingMode.HALF_UP) + "€/KWh");
-                    precioMedio.setText(bdPrecioMedio.divide(bdmil,3, RoundingMode.HALF_UP) + "€");
+                    precioMedio.setText(bdPrecioMedio.divide(bdmil,3, RoundingMode.HALF_UP) + "€/KWh");
                     precioPunta.setText(bdPrecioPunta.divide(bdmil,3, RoundingMode.HALF_UP) + "€/KWh");
 
                     //Creamos el adaptador con los datos de la lista.
@@ -151,6 +196,11 @@ public class PricesFragment extends Fragment {
             }
         });
 
+        switchGrafica.setOnCheckedChangeListener(
+
+        );
+
+        //Este solo se ejecuta la primera vez.
         pricesAdapter = new PricesAdapter(priceList, switchGrafica.isChecked());
         rvListaPrecios.setAdapter(pricesAdapter);
 
@@ -175,8 +225,8 @@ public class PricesFragment extends Fragment {
                     priceList.addAll(Arrays.asList(respuestaESIOS.getPreciosJSON()));
 
                     if(switchGrafica.isChecked()) {//Grafica
-                        //switchEnergia.setVisibility(View.INVISIBLE);
-                        //LineChart.crearGrafico(mView, rvListaPrecios);
+                        switchEnergia.setVisibility(View.INVISIBLE);
+                        LineChart.crearGrafico(mView, priceList);
                     }
                     else {//Lista
 

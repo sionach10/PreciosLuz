@@ -90,7 +90,7 @@ public class ChartsFragment extends Fragment {
                         try {
                             fechasBusqueda = CalendarDatePickerProvider.obtenerFechasFromDatePicker(_dayOfMonth, _month + 1, _year); //El datePicker usa los meses de 0 a 11.
                             fecha.setText(fechasBusqueda[0]);
-                            leerTxtFromWeb(fechasBusqueda);
+                            leerWS_OMIE(fechasBusqueda);
                         } catch (ParseException | IOException e) {
                             e.printStackTrace();
                         }
@@ -141,7 +141,7 @@ public class ChartsFragment extends Fragment {
 
             fechasDefault = CalendarDatePickerProvider.obtenerFechasFromDatePicker(startDay, startMonth + 1, startYear);
             fecha.setText(fechasDefault[0]);
-            leerTxtFromWeb(fechasDefault);
+            leerWS_OMIE(fechasDefault);
             mDialog.dismiss();
 
         } catch (ParseException | IOException e) {
@@ -165,7 +165,7 @@ public class ChartsFragment extends Fragment {
         });
     }
 
-    public void leerTxtFromWeb(String[] _fechasBusqueda) throws IOException {
+    public void leerWS_OMIE(String[] _fechasBusqueda) throws IOException {
         // Replace format
         String fecha = _fechasBusqueda[0].replace("/", "_");
         String url = "https://www.omie.es/sites/default/files/dados/AGNO_" + fecha.substring(6, 10) + "/MES_" + fecha.substring(3, 5) + "/TXT/INT_PBC_TECNOLOGIAS_H_9_" + fecha + "_" + fecha + ".TXT";
