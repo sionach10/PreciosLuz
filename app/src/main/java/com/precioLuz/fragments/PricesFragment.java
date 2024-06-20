@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -196,9 +197,24 @@ public class PricesFragment extends Fragment {
             }
         });
 
-        switchGrafica.setOnCheckedChangeListener(
+        switchGrafica.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked) {
+                    switchEnergia.setVisibility(View.INVISIBLE);
+                    LineChart.crearGrafico(mView, priceList);
+                }
+                else {
+                    switchEnergia.setVisibility(View.VISIBLE);
+                    //Ocultar LineChart.
+                    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, 0);
+                    linePricesChart.setLayoutParams(lp);
 
-        );
+                    rvListaPrecios.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+
+                }
+            }
+        });
 
         //Este solo se ejecuta la primera vez.
         pricesAdapter = new PricesAdapter(priceList, switchGrafica.isChecked());

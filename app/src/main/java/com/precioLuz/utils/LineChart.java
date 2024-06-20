@@ -34,13 +34,13 @@ public class LineChart {
     public static void crearGrafico(View mView, List<PreciosJSON> mList) {
 
         com.github.mikephil.charting.charts.LineChart chart = mView.findViewById(R.id.linePricesChart);
-        ListView listViewPrices = mView.findViewById(R.id.listaItemsPrecios);
+        RecyclerView rvViewPrices = mView.findViewById(R.id.listaItemsPrecios);
 
         //Ocultar PieChart.
         int width = 0;
         int height = 0;
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(width, height);
-        listViewPrices.setLayoutParams(lp);
+        rvViewPrices.setLayoutParams(lp);
 
         chart.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1550)); //TODO: No me coge la altura con MATCH_PARENT.
 
@@ -59,7 +59,7 @@ public class LineChart {
     }
 
     private static void configurarEjesChart(com.github.mikephil.charting.charts.LineChart chart) {
-        final int fillColorCarbon = ContextCompat.getColor(chart.getContext(), R.color.nuclear);
+        final int fillColorCarbon = ContextCompat.getColor(chart.getContext(), R.color.white);
         chart.setBackgroundColor(Color.WHITE);
         chart.setGridBackgroundColor(fillColorCarbon);
         chart.setDrawGridBackground(true);
