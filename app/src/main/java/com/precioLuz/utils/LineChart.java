@@ -33,42 +33,35 @@ public class LineChart {
 
     public static void crearGrafico(View mView, List<PreciosJSON> mList) {
 
-        com.github.mikephil.charting.charts.LineChart chart = mView.findViewById(R.id.linePricesChart);
-        RecyclerView rvViewPrices = mView.findViewById(R.id.listaItemsPrecios);
-
-        //Ocultar PieChart.
-        int width = 0;
-        int height = 0;
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(width, height);
-        rvViewPrices.setLayoutParams(lp);
-
-        chart.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1550)); //TODO: No me coge la altura con MATCH_PARENT.
-
+        com.github.mikephil.charting.charts.LineChart lineChart = mView.findViewById(R.id.linePricesChart);
 
         //Opciones del grafico:
-        configurarEjesChart(chart);
+        configurarEjesChart(lineChart);
 
         // use the interface ILineDataSet
         List<ILineDataSet> dataSets = new ArrayList<ILineDataSet>();
 
-        obtenerDatos(chart, mList, dataSets);
+        obtenerDatos(lineChart, mList, dataSets);
 
         LineData data = new LineData(dataSets);
-        chart.setData(data);
-        chart.invalidate(); // refresh
+        lineChart.setData(data);
+        lineChart.invalidate(); // refresh
     }
 
     private static void configurarEjesChart(com.github.mikephil.charting.charts.LineChart chart) {
-        final int fillColorCarbon = ContextCompat.getColor(chart.getContext(), R.color.white);
+        final int fillColorLine = ContextCompat.getColor(chart.getContext(), R.color.nuclear);
         chart.setBackgroundColor(Color.WHITE);
-        chart.setGridBackgroundColor(fillColorCarbon);
+        chart.setGridBackgroundColor(fillColorLine);
         chart.setDrawGridBackground(true);
         chart.getLegend().setWordWrapEnabled(true);
         chart.getXAxis().setDrawGridLines(false);
+        chart.getXAxis().setTextSize(12f);
         chart.getAxisLeft().setDrawGridLines(false);
+        chart.getAxisLeft().setTextSize(12f);
         chart.getAxisRight().setDrawGridLines(false);
         chart.getAxisRight().setEnabled(false);
         chart.setDrawBorders(true);
+
         YAxis leftAxis = chart.getAxisLeft();
         leftAxis.setAxisMinimum(0);
         Description text = chart.getDescription();
@@ -97,6 +90,7 @@ public class LineChart {
         dataSet1.setFillColor(ContextCompat.getColor(chart.getContext(), R.color.white));
         dataSet1.setHighLightColor(Color.rgb(244, 117, 117));
         dataSet1.setDrawCircleHole(false);
+        dataSet1.setValueTextSize(11f);
         dataSet1.setFillFormatter(new IFillFormatter() {
             @Override
             public float getFillLinePosition(ILineDataSet dataSet, LineDataProvider dataProvider) {

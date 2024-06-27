@@ -2,14 +2,17 @@ package com.precioLuz.adapters;
 
 import android.content.Context;
 import android.graphics.drawable.LayerDrawable;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -43,7 +46,9 @@ public class PricesAdapter extends RecyclerView.Adapter<PricesAdapter.PriceViewH
     public static class PriceViewHolder extends RecyclerView.ViewHolder {
         TextView hour, price;
         ImageView iconClock;
+        CardView cvTooltipPrices;
         RelativeLayout relativeLayout;
+
 
         public PriceViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -51,6 +56,8 @@ public class PricesAdapter extends RecyclerView.Adapter<PricesAdapter.PriceViewH
             price = itemView.findViewById(R.id.price);
             iconClock = itemView.findViewById(R.id.iconClock);
             relativeLayout = itemView.findViewById(R.id.relativeLayoutItemListaPrecios);
+            cvTooltipPrices = itemView.findViewById(R.id.cdTooltipPrices);
+
         }
     }
 
@@ -75,8 +82,25 @@ public class PricesAdapter extends RecyclerView.Adapter<PricesAdapter.PriceViewH
             holder.relativeLayout.setBackgroundResource(R.drawable.item_background_current_hour);
         }
 
+        //Tooltip
+        holder.iconClock.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                showTooltip(v);
+                return true;
+            }
+        });
 
 
+
+    }
+
+    private void showTooltip(View anchorView) {
+        View tooltipView = LayoutInflater.from(anchorView.getContext()).inflate(R.layout.tooltip_prices, null);
+
+        final PopupWindow popupWindow = new PopupWindow(tooltipView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        popupWindow.setFocusable(true);
+        popupWindow.showAsDropDown(anchorView, 0, 0, Gravity.TOP);
     }
 
     @Override

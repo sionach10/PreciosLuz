@@ -72,6 +72,7 @@ public class AreaChart {
         leftAxis.setAxisMinimum(0);
         Description text = chart.getDescription();
         text.setText("Energía horaria por tecnología");
+        text.setTextSize(12f);
 
     }
 
@@ -127,7 +128,7 @@ public class AreaChart {
 
         LineDataSet dataSet1 = new LineDataSet(serieCarbon, "Carbon"); // add entries to dataset
         dataSet1.setAxisDependency(YAxis.AxisDependency.LEFT);
-        dataSet1.setColor(ContextCompat.getColor(chart.getContext(), R.color.nuclear));
+        dataSet1.setColor(ContextCompat.getColor(chart.getContext(), R.color.carbon));
         dataSet1.setDrawCircles(false);
         dataSet1.setLineWidth(2f);
         dataSet1.setCircleRadius(3f);

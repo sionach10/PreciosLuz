@@ -19,6 +19,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.widget.TooltipCompat;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -201,17 +202,14 @@ public class PricesFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked) {
-                    switchEnergia.setVisibility(View.INVISIBLE);
-                    LineChart.crearGrafico(mView, priceList);
+                        switchEnergia.setVisibility(View.GONE);
+                        rvListaPrecios.setVisibility(View.GONE);
+                        linePricesChart.setVisibility(View.VISIBLE);
                 }
                 else {
                     switchEnergia.setVisibility(View.VISIBLE);
-                    //Ocultar LineChart.
-                    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, 0);
-                    linePricesChart.setLayoutParams(lp);
-
-                    rvListaPrecios.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-
+                    rvListaPrecios.setVisibility(View.VISIBLE);
+                    linePricesChart.setVisibility(View.GONE);
                 }
             }
         });
@@ -222,6 +220,8 @@ public class PricesFragment extends Fragment {
 
         return mView;
     }
+
+
 
     private void leerWSESIOS(String [] _fechasBusqueda) {
 
@@ -240,41 +240,49 @@ public class PricesFragment extends Fragment {
                     priceList.clear();
                     priceList.addAll(Arrays.asList(respuestaESIOS.getPreciosJSON()));
 
+
+                    //Me guardo los valores de cardView para modificarlos fuera de esta funcion
+                    respuestaESIOSCardView = respuestaESIOS;
+
+                    //Seteamos valores del cardView
+                    BigDecimal bdPrecioValle = new BigDecimal(respuestaESIOS.getPrecioValle());
+                    BigDecimal bdPrecioMedio = respuestaESIOS.getMedia();
+                    BigDecimal bdPrecioPunta = new BigDecimal(respuestaESIOS.getPrecioPunta());
+                    BigDecimal bdmil = new BigDecimal("1000");
+
+                    //Seteamos valores del cardView
+                    horaValle.setText(respuestaESIOS.getHoraValle());
+                    precioValle.setText(bdPrecioValle.divide(bdmil,3, RoundingMode.HALF_UP) + "€/KWh");
+                    precioMedio.setText(bdPrecioMedio.divide(bdmil,3, RoundingMode.HALF_UP) + "€/KWh");
+                    horaPunta.setText(respuestaESIOS.getHoraPunta());
+                    precioPunta.setText(bdPrecioPunta.divide(bdmil,3, RoundingMode.HALF_UP) + "€/KWh");
+
+
+
+
+                    //Creamos el adaptador con los datos de la lista.
+                    pricesAdapter = new PricesAdapter(priceList, switchEnergia.isChecked());
+
+                    //Vaciamos la lista al cambiar de día:
+                    rvListaPrecios.setAdapter(null);
+
+                    //Cargamos los datos del adapter a la vista.
+                    rvListaPrecios.setAdapter(pricesAdapter);
+
+                    //Seteamos tanto el gráfico como la lista de items de precios.
+                    LineChart.crearGrafico(mView, priceList);
+
+
                     if(switchGrafica.isChecked()) {//Grafica
-                        switchEnergia.setVisibility(View.INVISIBLE);
-                        LineChart.crearGrafico(mView, priceList);
+                        switchEnergia.setVisibility(View.GONE);
+                        rvListaPrecios.setVisibility(View.GONE);
+                        linePricesChart.setVisibility(View.VISIBLE);
                     }
                     else {//Lista
-
-                        //Me guardo los valores de cardView para modificarlos fuera de esta funcion
-                        respuestaESIOSCardView = respuestaESIOS;
-
-                        //Seteamos valores del cardView
-                        BigDecimal bdPrecioValle = new BigDecimal(respuestaESIOS.getPrecioValle());
-                        BigDecimal bdPrecioMedio = respuestaESIOS.getMedia();
-                        BigDecimal bdPrecioPunta = new BigDecimal(respuestaESIOS.getPrecioPunta());
-                        BigDecimal bdmil = new BigDecimal("1000");
-
-                        //Seteamos valores del cardView
-                        horaValle.setText(respuestaESIOS.getHoraValle());
-                        precioValle.setText(bdPrecioValle.divide(bdmil,3, RoundingMode.HALF_UP) + "€/KWh");
-                        precioMedio.setText(bdPrecioMedio.divide(bdmil,3, RoundingMode.HALF_UP) + "€/KWh");
-                        horaPunta.setText(respuestaESIOS.getHoraPunta());
-                        precioPunta.setText(bdPrecioPunta.divide(bdmil,3, RoundingMode.HALF_UP) + "€/KWh");
-
-
-
-
-                        //Creamos el adaptador con los datos de la lista.
-                        pricesAdapter = new PricesAdapter(priceList, switchEnergia.isChecked());
-
-                        //Vaciamos la lista al cambiar de día:
-                        rvListaPrecios.setAdapter(null);
-
-                        //Cargamos los datos del adapter a la vista.
-                        rvListaPrecios.setAdapter(pricesAdapter);
+                        switchEnergia.setVisibility(View.VISIBLE);
+                        rvListaPrecios.setVisibility(View.VISIBLE);
+                        linePricesChart.setVisibility(View.GONE);
                     }
-
 
                 } catch (JSONException e) {
                     e.printStackTrace();
